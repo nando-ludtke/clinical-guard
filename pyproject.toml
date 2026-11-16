@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "clinical-guard"
 version = "0.1.0"
 description = "Deterministic pre-generation safety guard and role-based clinical routing microservice."
+license = { text = "CC-BY-NC-4.0" }
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115",

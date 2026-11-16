@@ -1,5 +1,9 @@
 # clinical-guard
 
+> **Disclaimer:** Engineering & research demonstration; not a certified medical device / SaMD.
+
+Built from the intersection of clinical medicine and backend engineering, `clinical-guard` addresses a recurring failure mode of off-the-shelf LLM guardrails in healthcare: generic safety filters either **block legitimate clinician queries** (e.g., overdose antidotes or toxicology dosing), **over-redact medically critical parameters** like `"72 kg"` or patient age as PII, **miss multilingual or colloquial crisis signals** (such as German/slang self-harm expressions), or **leak raw PHI to third-party APIs** before screening. `clinical-guard` solves this with a **local-first, CPU-friendly FastAPI microservice stack** that pairs role-aware semantic safety routing (`layman` vs. `medical_professional`), domain-preserving local PHI/PII anonymization, and citation-verified context groundedness before any external LLM call.
+
 Deterministic pre-generation safety guard, role-based clinical routing, local PHI/PII anonymization, and citation-aware context groundedness microservice built with FastAPI and Pydantic v2.
 
 ## Core Capabilities
@@ -58,7 +62,7 @@ docker compose up --build
 
 Optional environment variables (`.env` or shell):
 - `OPENAI_API_KEY`: Default provider key for `litellm` in `ContextGroundednessChecker` (can also be supplied per request via `X-OpenAI-Api-Key`).
-- `HF_TOKEN`: Hugging Face token if pulling gated models not already cached under `models/`.
+- `HF_TOKEN`: **One-time setup note** — `meta-llama/Llama-Prompt-Guard-2-86M` is a gated Meta repository, so on first startup (when not already cached under `models/`) you must accept the model license on Hugging Face and provide `HF_TOKEN` in `.env`. By contrast, `intfloat/multilingual-e5-small` and `onnx-community/multilang-pii-ner-ONNX` download automatically without a token.
 
 ### 3. Tests, Linting & Benchmarks
 
@@ -82,3 +86,7 @@ Optional environment variables (`.env` or shell):
 - [Context Groundedness Check](docs/context_check.md)
 - [Local NER & PII Anonymization](docs/privacy_anonymizer.md)
 - [4-Container Docker Deployment & Configuration](docs/deployment.md)
+
+## License
+
+This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License (**CC BY-NC 4.0**) — see [LICENSE](LICENSE) for details. Non-commercial research and portfolio use only; contact the author for commercial licensing.
