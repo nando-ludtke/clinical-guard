@@ -1,0 +1,2074 @@
+{
+  "eval_file": "/Users/nandoludtke/Documents/GitHub/clinical-guard/data/eval/ner_pii_eval.jsonl",
+  "total_rows": 24,
+  "benchmarks": {
+    "regex_only": {
+      "mode": "regex_only",
+      "enable_ner": false,
+      "model_name": "regex-only",
+      "device": "cpu",
+      "model_load_ms": 0.0,
+      "latency_ms": {
+        "mean": 0.0507,
+        "p50": 0.0474,
+        "p95": 0.0629,
+        "max": 0.0888
+      },
+      "metrics": {
+        "total_rows": 24,
+        "total_must_mask": 76,
+        "masked_count": 35,
+        "missed_count": 41,
+        "mask_recall": 0.4605,
+        "total_must_preserve": 83,
+        "preserved_count": 83,
+        "false_positive_count": 0,
+        "preservation_rate": 1.0,
+        "false_positive_rate": 0.0
+      },
+      "breakdowns": {
+        "by_language": {
+          "de": {
+            "total_rows": 12,
+            "total_must_mask": 38,
+            "masked_count": 15,
+            "missed_count": 23,
+            "mask_recall": 0.3947,
+            "total_must_preserve": 38,
+            "preserved_count": 38,
+            "false_positive_count": 0,
+            "preservation_rate": 1.0,
+            "false_positive_rate": 0.0
+          },
+          "en": {
+            "total_rows": 12,
+            "total_must_mask": 38,
+            "masked_count": 20,
+            "missed_count": 18,
+            "mask_recall": 0.5263,
+            "total_must_preserve": 45,
+            "preserved_count": 45,
+            "false_positive_count": 0,
+            "preservation_rate": 1.0,
+            "false_positive_rate": 0.0
+          }
+        },
+        "by_case_type": {
+          "clinical_eponym_trap": {
+            "total_rows": 6,
+            "total_must_mask": 14,
+            "masked_count": 8,
+            "missed_count": 6,
+            "mask_recall": 0.5714,
+            "total_must_preserve": 24,
+            "preserved_count": 24,
+            "false_positive_count": 0,
+            "preservation_rate": 1.0,
+            "false_positive_rate": 0.0
+          },
+          "dosage_lab_trap": {
+            "total_rows": 6,
+            "total_must_mask": 14,
+            "masked_count": 7,
+            "missed_count": 7,
+            "mask_recall": 0.5,
+            "total_must_preserve": 28,
+            "preserved_count": 28,
+            "false_positive_count": 0,
+            "preservation_rate": 1.0,
+            "false_positive_rate": 0.0
+          },
+          "mixed_edge_case": {
+            "total_rows": 4,
+            "total_must_mask": 16,
+            "masked_count": 4,
+            "missed_count": 12,
+            "mask_recall": 0.25,
+            "total_must_preserve": 13,
+            "preserved_count": 13,
+            "false_positive_count": 0,
+            "preservation_rate": 1.0,
+            "false_positive_rate": 0.0
+          },
+          "multilingual_name_address": {
+            "total_rows": 4,
+            "total_must_mask": 16,
+            "masked_count": 6,
+            "missed_count": 10,
+            "mask_recall": 0.375,
+            "total_must_preserve": 8,
+            "preserved_count": 8,
+            "false_positive_count": 0,
+            "preservation_rate": 1.0,
+            "false_positive_rate": 0.0
+          },
+          "standard_pii": {
+            "total_rows": 4,
+            "total_must_mask": 16,
+            "masked_count": 10,
+            "missed_count": 6,
+            "mask_recall": 0.625,
+            "total_must_preserve": 10,
+            "preserved_count": 10,
+            "false_positive_count": 0,
+            "preservation_rate": 1.0,
+            "false_positive_rate": 0.0
+          }
+        }
+      },
+      "predictions": [
+        {
+          "id": "en_ner_01",
+          "language": "en",
+          "case_type": "standard_pii",
+          "text": "Patient John Miller (DOB: 1978-05-14, MRN-88421) reports chest tightness. Contact: john.miller@example.org or (415) 555-0192. BP 120/80 mmHg, ECG normal.",
+          "must_mask": [
+            "John Miller",
+            "1978-05-14",
+            "MRN-88421",
+            "john.miller@example.org",
+            "(415) 555-0192"
+          ],
+          "must_preserve": [
+            "chest tightness",
+            "120/80 mmHg",
+            "ECG"
+          ],
+          "anonymized_text": "<PERSON_1> (DOB: <DATE_1>, <ID_1>) reports chest tightness. Contact: <EMAIL_1> or <PHONE_1>. BP 120/80 mmHg, ECG normal.",
+          "entity_table": {
+            "<PERSON_1>": "Patient John Miller",
+            "<DATE_1>": "1978-05-14",
+            "<ID_1>": "MRN-88421",
+            "<EMAIL_1>": "john.miller@example.org",
+            "<PHONE_1>": "(415) 555-0192"
+          },
+          "masked_items": [
+            "John Miller",
+            "1978-05-14",
+            "MRN-88421",
+            "john.miller@example.org",
+            "(415) 555-0192"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "chest tightness",
+            "120/80 mmHg",
+            "ECG"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0888
+        },
+        {
+          "id": "en_ner_02",
+          "language": "en",
+          "case_type": "standard_pii",
+          "text": "Follow-up for Sarah Jenkins, born 05/14/1985, residing at 742 Evergreen Terrace, Springfield. Prescribed Acetaminophen 500 mg PRN for tension headache.",
+          "must_mask": [
+            "Sarah Jenkins",
+            "05/14/1985",
+            "742 Evergreen Terrace, Springfield"
+          ],
+          "must_preserve": [
+            "Acetaminophen",
+            "500 mg",
+            "tension headache"
+          ],
+          "anonymized_text": "Follow-up for Sarah Jenkins, born <DATE_1>, residing at 742 Evergreen Terrace, Springfield. Prescribed Acetaminophen 500 mg PRN for tension headache.",
+          "entity_table": {
+            "<DATE_1>": "05/14/1985"
+          },
+          "masked_items": [
+            "05/14/1985"
+          ],
+          "missed_masks": [
+            "Sarah Jenkins",
+            "742 Evergreen Terrace, Springfield"
+          ],
+          "mask_recall": 0.3333,
+          "preserved_items": [
+            "Acetaminophen",
+            "500 mg",
+            "tension headache"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0539
+        },
+        {
+          "id": "en_ner_03",
+          "language": "en",
+          "case_type": "multilingual_name_address",
+          "text": "Maria Gonzalez presented on 2025-05-14 at our clinic. Lives at 1280 Mission Street, San Francisco; phone +1 415-890-4431. HbA1c 6.8% on Metformin 500 mg BID.",
+          "must_mask": [
+            "Maria Gonzalez",
+            "2025-05-14",
+            "1280 Mission Street, San Francisco",
+            "+1 415-890-4431"
+          ],
+          "must_preserve": [
+            "HbA1c 6.8%",
+            "Metformin 500 mg"
+          ],
+          "anonymized_text": "Maria Gonzalez presented on <DATE_1> at our clinic. Lives at 1280 Mission Street, San Francisco; phone <PHONE_1>. HbA1c 6.8% on Metformin 500 mg BID.",
+          "entity_table": {
+            "<DATE_1>": "2025-05-14",
+            "<PHONE_1>": "+1 415-890-4431"
+          },
+          "masked_items": [
+            "2025-05-14",
+            "+1 415-890-4431"
+          ],
+          "missed_masks": [
+            "Maria Gonzalez",
+            "1280 Mission Street, San Francisco"
+          ],
+          "mask_recall": 0.5,
+          "preserved_items": [
+            "HbA1c 6.8%",
+            "Metformin 500 mg"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.062
+        },
+        {
+          "id": "en_ner_04",
+          "language": "en",
+          "case_type": "multilingual_name_address",
+          "text": "Referral from Dr. med. Elena Rostova regarding patient Tomasz Kowalski (Pat-ID: 109234). Address: 45 Baker Street, London. Ordered CT thorax and CBC.",
+          "must_mask": [
+            "Dr. med. Elena Rostova",
+            "Tomasz Kowalski",
+            "Pat-ID: 109234",
+            "45 Baker Street, London"
+          ],
+          "must_preserve": [
+            "CT thorax",
+            "CBC"
+          ],
+          "anonymized_text": "Referral from Dr. med. Elena Rostova regarding patient Tomasz Kowalski (<ID_1>). Address: 45 Baker Street, London. Ordered CT thorax and CBC.",
+          "entity_table": {
+            "<ID_1>": "Pat-ID: 109234"
+          },
+          "masked_items": [
+            "Pat-ID: 109234"
+          ],
+          "missed_masks": [
+            "Dr. med. Elena Rostova",
+            "Tomasz Kowalski",
+            "45 Baker Street, London"
+          ],
+          "mask_recall": 0.25,
+          "preserved_items": [
+            "CT thorax",
+            "CBC"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0482
+        },
+        {
+          "id": "en_ner_05",
+          "language": "en",
+          "case_type": "clinical_eponym_trap",
+          "text": "David Chen (MRN-55109) evaluated for progressive tremor consistent with Parkinson's disease. Started Levodopa 100 mg TID; no signs of Alzheimer dementia.",
+          "must_mask": [
+            "David Chen",
+            "MRN-55109"
+          ],
+          "must_preserve": [
+            "Parkinson's disease",
+            "Parkinson",
+            "Levodopa",
+            "100 mg",
+            "Alzheimer"
+          ],
+          "anonymized_text": "David Chen (<ID_1>) evaluated for progressive tremor consistent with Parkinson's disease. Started Levodopa 100 mg TID; no signs of Alzheimer dementia.",
+          "entity_table": {
+            "<ID_1>": "MRN-55109"
+          },
+          "masked_items": [
+            "MRN-55109"
+          ],
+          "missed_masks": [
+            "David Chen"
+          ],
+          "mask_recall": 0.5,
+          "preserved_items": [
+            "Parkinson's disease",
+            "Parkinson",
+            "Levodopa",
+            "100 mg",
+            "Alzheimer"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0464
+        },
+        {
+          "id": "en_ner_06",
+          "language": "en",
+          "case_type": "clinical_eponym_trap",
+          "text": "Patient Emily Carter called from (312) 555-0148. History of Hashimoto thyroiditis and Crohn's disease; Wells Score 4 for DVT, D-dimer ordered.",
+          "must_mask": [
+            "Emily Carter",
+            "(312) 555-0148"
+          ],
+          "must_preserve": [
+            "Hashimoto",
+            "Crohn's disease",
+            "Wells Score 4",
+            "DVT",
+            "D-dimer"
+          ],
+          "anonymized_text": "<PERSON_1> called from <PHONE_1>. History of Hashimoto thyroiditis and Crohn's disease; Wells Score 4 for DVT, D-dimer ordered.",
+          "entity_table": {
+            "<PERSON_1>": "Patient Emily Carter",
+            "<PHONE_1>": "(312) 555-0148"
+          },
+          "masked_items": [
+            "Emily Carter",
+            "(312) 555-0148"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "Hashimoto",
+            "Crohn's disease",
+            "Wells Score 4",
+            "DVT",
+            "D-dimer"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0531
+        },
+        {
+          "id": "en_ner_07",
+          "language": "en",
+          "case_type": "clinical_eponym_trap",
+          "text": "Consult note by Dr. Marcus Vance for Rebecca Hall (DOB: 03/22/1969). Suspect Bell's palsy vs. Guillain-Barre syndrome; ESR 18 mm/h.",
+          "must_mask": [
+            "Dr. Marcus Vance",
+            "Rebecca Hall",
+            "03/22/1969"
+          ],
+          "must_preserve": [
+            "Bell's palsy",
+            "Guillain-Barre syndrome",
+            "ESR 18 mm/h"
+          ],
+          "anonymized_text": "Consult note by <PERSON_1> for Rebecca Hall (DOB: <DATE_1>). Suspect Bell's palsy vs. Guillain-Barre syndrome; ESR 18 mm/h.",
+          "entity_table": {
+            "<PERSON_1>": "Dr. Marcus Vance",
+            "<DATE_1>": "03/22/1969"
+          },
+          "masked_items": [
+            "Dr. Marcus Vance",
+            "03/22/1969"
+          ],
+          "missed_masks": [
+            "Rebecca Hall"
+          ],
+          "mask_recall": 0.6667,
+          "preserved_items": [
+            "Bell's palsy",
+            "Guillain-Barre syndrome",
+            "ESR 18 mm/h"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0551
+        },
+        {
+          "id": "en_ner_08",
+          "language": "en",
+          "case_type": "dosage_lab_trap",
+          "text": "Pediatric dosing for Liam O'Connor (MRN-77310, DOB: 2018-11-02): Amoxicillin 10 mg/kg PO q8h. Temp 38.4 C, WBC 11.2.",
+          "must_mask": [
+            "Liam O'Connor",
+            "MRN-77310",
+            "2018-11-02"
+          ],
+          "must_preserve": [
+            "Amoxicillin",
+            "10 mg/kg",
+            "38.4 C",
+            "WBC 11.2"
+          ],
+          "anonymized_text": "Pediatric dosing for Liam O'Connor (<ID_1>, DOB: <DATE_1>): Amoxicillin 10 mg/kg PO q8h. Temp 38.4 C, WBC 11.2.",
+          "entity_table": {
+            "<ID_1>": "MRN-77310",
+            "<DATE_1>": "2018-11-02"
+          },
+          "masked_items": [
+            "MRN-77310",
+            "2018-11-02"
+          ],
+          "missed_masks": [
+            "Liam O'Connor"
+          ],
+          "mask_recall": 0.6667,
+          "preserved_items": [
+            "Amoxicillin",
+            "10 mg/kg",
+            "38.4 C",
+            "WBC 11.2"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0447
+        },
+        {
+          "id": "en_ner_09",
+          "language": "en",
+          "case_type": "dosage_lab_trap",
+          "text": "Anticoagulation clinic: Robert Kim, email r.kim@clinicmail.net. INR 2.4 today on Warfarin 5 mg daily; potassium 4.3 mmol/L, creatinine 0.9 mg/dL.",
+          "must_mask": [
+            "Robert Kim",
+            "r.kim@clinicmail.net"
+          ],
+          "must_preserve": [
+            "INR 2.4",
+            "Warfarin",
+            "5 mg",
+            "4.3 mmol/L",
+            "0.9 mg/dL"
+          ],
+          "anonymized_text": "Anticoagulation clinic: Robert Kim, email <EMAIL_1>. INR 2.4 today on Warfarin 5 mg daily; potassium 4.3 mmol/L, creatinine 0.9 mg/dL.",
+          "entity_table": {
+            "<EMAIL_1>": "r.kim@clinicmail.net"
+          },
+          "masked_items": [
+            "r.kim@clinicmail.net"
+          ],
+          "missed_masks": [
+            "Robert Kim"
+          ],
+          "mask_recall": 0.5,
+          "preserved_items": [
+            "INR 2.4",
+            "Warfarin",
+            "5 mg",
+            "4.3 mmol/L",
+            "0.9 mg/dL"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0481
+        },
+        {
+          "id": "en_ner_10",
+          "language": "en",
+          "case_type": "dosage_lab_trap",
+          "text": "Discharge summary for Priya Patel (Pat-ID: 448120): BP 120/80 mmHg, HR 72 bpm, SpO2 98%. Continue Metformin 500 mg and Lisinopril 10 mg.",
+          "must_mask": [
+            "Priya Patel",
+            "Pat-ID: 448120"
+          ],
+          "must_preserve": [
+            "120/80 mmHg",
+            "HR 72 bpm",
+            "SpO2 98%",
+            "Metformin 500 mg",
+            "Lisinopril",
+            "10 mg"
+          ],
+          "anonymized_text": "Discharge summary for Priya Patel (<ID_1>): BP 120/80 mmHg, HR 72 bpm, SpO2 98%. Continue Metformin 500 mg and Lisinopril 10 mg.",
+          "entity_table": {
+            "<ID_1>": "Pat-ID: 448120"
+          },
+          "masked_items": [
+            "Pat-ID: 448120"
+          ],
+          "missed_masks": [
+            "Priya Patel"
+          ],
+          "mask_recall": 0.5,
+          "preserved_items": [
+            "120/80 mmHg",
+            "HR 72 bpm",
+            "SpO2 98%",
+            "Metformin 500 mg",
+            "Lisinopril",
+            "10 mg"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0465
+        },
+        {
+          "id": "en_ner_11",
+          "language": "en",
+          "case_type": "mixed_edge_case",
+          "text": "Urgent message from Sofia Alvarez (05/14/2025): 'My mother Rosa Alvarez, DOB 14.05.1952, took 500 mg Acetaminophen after her CT thorax.' Reply to sofia.alvarez@mail.com.",
+          "must_mask": [
+            "Sofia Alvarez",
+            "05/14/2025",
+            "Rosa Alvarez",
+            "14.05.1952",
+            "sofia.alvarez@mail.com"
+          ],
+          "must_preserve": [
+            "500 mg",
+            "Acetaminophen",
+            "CT thorax"
+          ],
+          "anonymized_text": "Urgent message from Sofia Alvarez (<DATE_1>): 'My mother Rosa Alvarez, DOB 14.05.1952, took 500 mg Acetaminophen after her CT thorax.' Reply to <EMAIL_1>.",
+          "entity_table": {
+            "<DATE_1>": "05/14/2025",
+            "<EMAIL_1>": "sofia.alvarez@mail.com"
+          },
+          "masked_items": [
+            "05/14/2025",
+            "sofia.alvarez@mail.com"
+          ],
+          "missed_masks": [
+            "Sofia Alvarez",
+            "Rosa Alvarez",
+            "14.05.1952"
+          ],
+          "mask_recall": 0.4,
+          "preserved_items": [
+            "500 mg",
+            "Acetaminophen",
+            "CT thorax"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0582
+        },
+        {
+          "id": "en_ner_12",
+          "language": "en",
+          "case_type": "mixed_edge_case",
+          "text": "Triage note: Hannah Brooks, +44 20 7946 0958, 99 Maple Ave, Boston. Known Cushing's syndrome; HbA1c 6.8%, INR 2.4, Wells Score 4.",
+          "must_mask": [
+            "Hannah Brooks",
+            "+44 20 7946 0958",
+            "99 Maple Ave, Boston"
+          ],
+          "must_preserve": [
+            "Cushing's syndrome",
+            "HbA1c 6.8%",
+            "INR 2.4",
+            "Wells Score 4"
+          ],
+          "anonymized_text": "Triage note: Hannah Brooks, +44 20 7946 0958, 99 Maple Ave, Boston. Known Cushing's syndrome; HbA1c 6.8%, INR 2.4, Wells Score 4.",
+          "entity_table": {},
+          "masked_items": [],
+          "missed_masks": [
+            "Hannah Brooks",
+            "+44 20 7946 0958",
+            "99 Maple Ave, Boston"
+          ],
+          "mask_recall": 0.0,
+          "preserved_items": [
+            "Cushing's syndrome",
+            "HbA1c 6.8%",
+            "INR 2.4",
+            "Wells Score 4"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0419
+        },
+        {
+          "id": "de_ner_01",
+          "language": "de",
+          "case_type": "standard_pii",
+          "text": "Patient Lukas Weber (geb. 14.05.1982, Pat-ID: 109234) stellt sich mit Dyspnoe vor. Telefon: +49 30 901820, E-Mail: lukas.weber@beispiel.de. RR 120/80 mmHg.",
+          "must_mask": [
+            "Lukas Weber",
+            "14.05.1982",
+            "Pat-ID: 109234",
+            "+49 30 901820",
+            "lukas.weber@beispiel.de"
+          ],
+          "must_preserve": [
+            "Dyspnoe",
+            "120/80 mmHg"
+          ],
+          "anonymized_text": "<PERSON_1> (geb. 14.05.1982, <ID_1>) stellt sich mit Dyspnoe vor. Telefon: +49 30 901820, E-Mail: <EMAIL_1>. RR 120/80 mmHg.",
+          "entity_table": {
+            "<PERSON_1>": "Patient Lukas Weber",
+            "<ID_1>": "Pat-ID: 109234",
+            "<EMAIL_1>": "lukas.weber@beispiel.de"
+          },
+          "masked_items": [
+            "Lukas Weber",
+            "Pat-ID: 109234",
+            "lukas.weber@beispiel.de"
+          ],
+          "missed_masks": [
+            "14.05.1982",
+            "+49 30 901820"
+          ],
+          "mask_recall": 0.6,
+          "preserved_items": [
+            "Dyspnoe",
+            "120/80 mmHg"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0595
+        },
+        {
+          "id": "de_ner_02",
+          "language": "de",
+          "case_type": "standard_pii",
+          "text": "Arztbrief für Katrin Hoffmann, wohnhaft Friedrichstraße 114, 10117 Berlin, MRN-88421. Befund: CT thorax ohne Infiltrat, CRP 4.2 mg/L.",
+          "must_mask": [
+            "Katrin Hoffmann",
+            "Friedrichstraße 114, 10117 Berlin",
+            "MRN-88421"
+          ],
+          "must_preserve": [
+            "CT thorax",
+            "CRP 4.2 mg/L"
+          ],
+          "anonymized_text": "Arztbrief für Katrin Hoffmann, wohnhaft Friedrichstraße 114, 10117 Berlin, <ID_1>. Befund: CT thorax ohne Infiltrat, CRP 4.2 mg/L.",
+          "entity_table": {
+            "<ID_1>": "MRN-88421"
+          },
+          "masked_items": [
+            "MRN-88421"
+          ],
+          "missed_masks": [
+            "Katrin Hoffmann",
+            "Friedrichstraße 114, 10117 Berlin"
+          ],
+          "mask_recall": 0.3333,
+          "preserved_items": [
+            "CT thorax",
+            "CRP 4.2 mg/L"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0416
+        },
+        {
+          "id": "de_ner_03",
+          "language": "de",
+          "case_type": "multilingual_name_address",
+          "text": "Patient Hans-Jürgen Weiß, geb. 2025-05-14 (Aufnahmedatum), Anschrift: Goetheplatz 7, 80336 München. Medikation: Metformin 500 mg morgens, HbA1c 6.8%.",
+          "must_mask": [
+            "Hans-Jürgen Weiß",
+            "2025-05-14",
+            "Goetheplatz 7, 80336 München"
+          ],
+          "must_preserve": [
+            "Metformin 500 mg",
+            "HbA1c 6.8%"
+          ],
+          "anonymized_text": "<PERSON_1>-Jürgen Weiß, geb. <DATE_1> (Aufnahmedatum), Anschrift: Goetheplatz 7, 80336 München. Medikation: Metformin 500 mg morgens, HbA1c 6.8%.",
+          "entity_table": {
+            "<PERSON_1>": "Patient Hans",
+            "<DATE_1>": "2025-05-14"
+          },
+          "masked_items": [
+            "Hans-Jürgen Weiß",
+            "2025-05-14"
+          ],
+          "missed_masks": [
+            "Goetheplatz 7, 80336 München"
+          ],
+          "mask_recall": 0.6667,
+          "preserved_items": [
+            "Metformin 500 mg",
+            "HbA1c 6.8%"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0509
+        },
+        {
+          "id": "de_ner_04",
+          "language": "de",
+          "case_type": "multilingual_name_address",
+          "text": "Überweisung von Dr. med. Elena Rostova für Anja Schäfer-König (Pat-ID: 204819), Tel. +49 89 1234567. Adresse: Hauptstraße 22, 50667 Köln. Acetaminophen 500 mg bei Bedarf.",
+          "must_mask": [
+            "Dr. med. Elena Rostova",
+            "Anja Schäfer-König",
+            "Pat-ID: 204819",
+            "+49 89 1234567",
+            "Hauptstraße 22, 50667 Köln"
+          ],
+          "must_preserve": [
+            "Acetaminophen",
+            "500 mg"
+          ],
+          "anonymized_text": "Überweisung von Dr. med. Elena Rostova für Anja Schäfer-König (<ID_1>), Tel. +49 89 1234567. Adresse: Hauptstraße 22, 50667 Köln. Acetaminophen 500 mg bei Bedarf.",
+          "entity_table": {
+            "<ID_1>": "Pat-ID: 204819"
+          },
+          "masked_items": [
+            "Pat-ID: 204819"
+          ],
+          "missed_masks": [
+            "Dr. med. Elena Rostova",
+            "Anja Schäfer-König",
+            "+49 89 1234567",
+            "Hauptstraße 22, 50667 Köln"
+          ],
+          "mask_recall": 0.2,
+          "preserved_items": [
+            "Acetaminophen",
+            "500 mg"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0502
+        },
+        {
+          "id": "de_ner_05",
+          "language": "de",
+          "case_type": "clinical_eponym_trap",
+          "text": "Herr Matthias Becker (MRN-33901) mit bekanntem Morbus Crohn und Verdacht auf Morbus Basedow. TSH 0.08 mU/L, Therapie mit Thiamazol 10 mg.",
+          "must_mask": [
+            "Matthias Becker",
+            "MRN-33901"
+          ],
+          "must_preserve": [
+            "Morbus Crohn",
+            "Morbus Basedow",
+            "TSH 0.08 mU/L",
+            "Thiamazol",
+            "10 mg"
+          ],
+          "anonymized_text": "Herr Matthias Becker (<ID_1>) mit bekanntem Morbus Crohn und Verdacht auf Morbus Basedow. TSH 0.08 mU/L, Therapie mit Thiamazol 10 mg.",
+          "entity_table": {
+            "<ID_1>": "MRN-33901"
+          },
+          "masked_items": [
+            "MRN-33901"
+          ],
+          "missed_masks": [
+            "Matthias Becker"
+          ],
+          "mask_recall": 0.5,
+          "preserved_items": [
+            "Morbus Crohn",
+            "Morbus Basedow",
+            "TSH 0.08 mU/L",
+            "Thiamazol",
+            "10 mg"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0413
+        },
+        {
+          "id": "de_ner_06",
+          "language": "de",
+          "case_type": "clinical_eponym_trap",
+          "text": "Frau Sabine Krüger, geb. 09.11.1954, klagt über Gedächtnisstörungen; Ausschluss Alzheimer-Demenz und Parkinson-Syndrom. Kein Hinweis auf Hashimoto-Thyreoiditis.",
+          "must_mask": [
+            "Sabine Krüger",
+            "09.11.1954"
+          ],
+          "must_preserve": [
+            "Alzheimer",
+            "Parkinson",
+            "Hashimoto"
+          ],
+          "anonymized_text": "Frau Sabine Krüger, geb. 09.11.1954, klagt über Gedächtnisstörungen; Ausschluss Alzheimer-Demenz und Parkinson-Syndrom. Kein Hinweis auf Hashimoto-Thyreoiditis.",
+          "entity_table": {},
+          "masked_items": [],
+          "missed_masks": [
+            "Sabine Krüger",
+            "09.11.1954"
+          ],
+          "mask_recall": 0.0,
+          "preserved_items": [
+            "Alzheimer",
+            "Parkinson",
+            "Hashimoto"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0402
+        },
+        {
+          "id": "de_ner_07",
+          "language": "de",
+          "case_type": "clinical_eponym_trap",
+          "text": "Konsil durch Dr. Thomas Braun für Patientin Julia Richter (05/14/2025). Wells Score 4 Punkte, D-Dimere erhöht, Duplexsonographie veranlasst.",
+          "must_mask": [
+            "Dr. Thomas Braun",
+            "Julia Richter",
+            "05/14/2025"
+          ],
+          "must_preserve": [
+            "Wells Score 4",
+            "D-Dimere",
+            "Duplexsonographie"
+          ],
+          "anonymized_text": "Konsil durch <PERSON_1> für Patientin Julia Richter (<DATE_1>). Wells Score 4 Punkte, D-Dimere erhöht, Duplexsonographie veranlasst.",
+          "entity_table": {
+            "<PERSON_1>": "Dr. Thomas Braun",
+            "<DATE_1>": "05/14/2025"
+          },
+          "masked_items": [
+            "Dr. Thomas Braun",
+            "05/14/2025"
+          ],
+          "missed_masks": [
+            "Julia Richter"
+          ],
+          "mask_recall": 0.6667,
+          "preserved_items": [
+            "Wells Score 4",
+            "D-Dimere",
+            "Duplexsonographie"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0466
+        },
+        {
+          "id": "de_ner_08",
+          "language": "de",
+          "case_type": "dosage_lab_trap",
+          "text": "Pädiatrie: Jonas Meyer (Pat-ID: 551920), geb. 12.03.2019. Ibuprofen 10 mg/kg KG alle 8 Stunden, Temperatur 39.1 °C, Leukozyten 13.4/nL.",
+          "must_mask": [
+            "Jonas Meyer",
+            "Pat-ID: 551920",
+            "12.03.2019"
+          ],
+          "must_preserve": [
+            "Ibuprofen",
+            "10 mg/kg",
+            "39.1 °C",
+            "13.4/nL"
+          ],
+          "anonymized_text": "Pädiatrie: Jonas Meyer (<ID_1>), geb. 12.03.2019. Ibuprofen 10 mg/kg KG alle 8 Stunden, Temperatur 39.1 °C, Leukozyten 13.4/nL.",
+          "entity_table": {
+            "<ID_1>": "Pat-ID: 551920"
+          },
+          "masked_items": [
+            "Pat-ID: 551920"
+          ],
+          "missed_masks": [
+            "Jonas Meyer",
+            "12.03.2019"
+          ],
+          "mask_recall": 0.3333,
+          "preserved_items": [
+            "Ibuprofen",
+            "10 mg/kg",
+            "39.1 °C",
+            "13.4/nL"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0451
+        },
+        {
+          "id": "de_ner_09",
+          "language": "de",
+          "case_type": "dosage_lab_trap",
+          "text": "Marcumar-Sprechstunde: Claudia Zimmermann, E-Mail c.zimmermann@praxis-test.de. INR 2.4 im Zielbereich, Kalium 4.1 mmol/L, Kreatinin 0.85 mg/dL.",
+          "must_mask": [
+            "Claudia Zimmermann",
+            "c.zimmermann@praxis-test.de"
+          ],
+          "must_preserve": [
+            "INR 2.4",
+            "4.1 mmol/L",
+            "0.85 mg/dL"
+          ],
+          "anonymized_text": "Marcumar-Sprechstunde: Claudia Zimmermann, E-Mail <EMAIL_1>. INR 2.4 im Zielbereich, Kalium 4.1 mmol/L, Kreatinin 0.85 mg/dL.",
+          "entity_table": {
+            "<EMAIL_1>": "c.zimmermann@praxis-test.de"
+          },
+          "masked_items": [
+            "c.zimmermann@praxis-test.de"
+          ],
+          "missed_masks": [
+            "Claudia Zimmermann"
+          ],
+          "mask_recall": 0.5,
+          "preserved_items": [
+            "INR 2.4",
+            "4.1 mmol/L",
+            "0.85 mg/dL"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0447
+        },
+        {
+          "id": "de_ner_10",
+          "language": "de",
+          "case_type": "dosage_lab_trap",
+          "text": "Entlassbrief Stefan Wagner (MRN-61204): RR 120/80 mmHg, HF 68/min, SpO2 97%. Weiterführung von Metformin 500 mg und Ramipril 5 mg.",
+          "must_mask": [
+            "Stefan Wagner",
+            "MRN-61204"
+          ],
+          "must_preserve": [
+            "120/80 mmHg",
+            "HF 68/min",
+            "SpO2 97%",
+            "Metformin 500 mg",
+            "Ramipril",
+            "5 mg"
+          ],
+          "anonymized_text": "Entlassbrief Stefan Wagner (<ID_1>): RR 120/80 mmHg, HF 68/min, SpO2 97%. Weiterführung von Metformin 500 mg und Ramipril 5 mg.",
+          "entity_table": {
+            "<ID_1>": "MRN-61204"
+          },
+          "masked_items": [
+            "MRN-61204"
+          ],
+          "missed_masks": [
+            "Stefan Wagner"
+          ],
+          "mask_recall": 0.5,
+          "preserved_items": [
+            "120/80 mmHg",
+            "HF 68/min",
+            "SpO2 97%",
+            "Metformin 500 mg",
+            "Ramipril",
+            "5 mg"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0413
+        },
+        {
+          "id": "de_ner_11",
+          "language": "de",
+          "case_type": "mixed_edge_case",
+          "text": "Patientennachricht von Mehmet Yılmaz (14.05.2025): 'Meine Frau Ayşe Yılmaz, geb. 1980-07-19, nimmt täglich 500 mg Metformin.' Rückruf unter +49 30 901820.",
+          "must_mask": [
+            "Mehmet Yılmaz",
+            "14.05.2025",
+            "Ayşe Yılmaz",
+            "1980-07-19",
+            "+49 30 901820"
+          ],
+          "must_preserve": [
+            "500 mg",
+            "Metformin"
+          ],
+          "anonymized_text": "Patientennachricht von Mehmet Yılmaz (14.05.2025): 'Meine Frau Ayşe Yılmaz, geb. <DATE_1>, nimmt täglich 500 mg Metformin.' Rückruf unter +49 30 901820.",
+          "entity_table": {
+            "<DATE_1>": "1980-07-19"
+          },
+          "masked_items": [
+            "1980-07-19"
+          ],
+          "missed_masks": [
+            "Mehmet Yılmaz",
+            "14.05.2025",
+            "Ayşe Yılmaz",
+            "+49 30 901820"
+          ],
+          "mask_recall": 0.2,
+          "preserved_items": [
+            "500 mg",
+            "Metformin"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0629
+        },
+        {
+          "id": "de_ner_12",
+          "language": "de",
+          "case_type": "mixed_edge_case",
+          "text": "Notaufnahme: Franziska Müller-Lüdenscheidt, Berliner Allee 45, 40212 Düsseldorf, Tel. (415) 555-0192. V.a. Morbus Crohn, CT thorax unauffällig, INR 2.4, HbA1c 6.8%.",
+          "must_mask": [
+            "Franziska Müller-Lüdenscheidt",
+            "Berliner Allee 45, 40212 Düsseldorf",
+            "(415) 555-0192"
+          ],
+          "must_preserve": [
+            "Morbus Crohn",
+            "CT thorax",
+            "INR 2.4",
+            "HbA1c 6.8%"
+          ],
+          "anonymized_text": "Notaufnahme: Franziska Müller-Lüdenscheidt, Berliner Allee 45, 40212 Düsseldorf, Tel. <PHONE_1>. V.a. Morbus Crohn, CT thorax unauffällig, INR 2.4, HbA1c 6.8%.",
+          "entity_table": {
+            "<PHONE_1>": "(415) 555-0192"
+          },
+          "masked_items": [
+            "(415) 555-0192"
+          ],
+          "missed_masks": [
+            "Franziska Müller-Lüdenscheidt",
+            "Berliner Allee 45, 40212 Düsseldorf"
+          ],
+          "mask_recall": 0.3333,
+          "preserved_items": [
+            "Morbus Crohn",
+            "CT thorax",
+            "INR 2.4",
+            "HbA1c 6.8%"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 0.0447
+        }
+      ]
+    },
+    "regex_plus_onnx_ner": {
+      "mode": "regex_plus_onnx_ner",
+      "enable_ner": true,
+      "model_name": "models/multilang-pii-ner-ONNX",
+      "device": "cpu",
+      "model_load_ms": 896.66,
+      "latency_ms": {
+        "mean": 26.3484,
+        "p50": 24.9248,
+        "p95": 36.124,
+        "max": 42.0171
+      },
+      "metrics": {
+        "total_rows": 24,
+        "total_must_mask": 76,
+        "masked_count": 74,
+        "missed_count": 2,
+        "mask_recall": 0.9737,
+        "total_must_preserve": 83,
+        "preserved_count": 83,
+        "false_positive_count": 0,
+        "preservation_rate": 1.0,
+        "false_positive_rate": 0.0
+      },
+      "breakdowns": {
+        "by_language": {
+          "de": {
+            "total_rows": 12,
+            "total_must_mask": 38,
+            "masked_count": 36,
+            "missed_count": 2,
+            "mask_recall": 0.9474,
+            "total_must_preserve": 38,
+            "preserved_count": 38,
+            "false_positive_count": 0,
+            "preservation_rate": 1.0,
+            "false_positive_rate": 0.0
+          },
+          "en": {
+            "total_rows": 12,
+            "total_must_mask": 38,
+            "masked_count": 38,
+            "missed_count": 0,
+            "mask_recall": 1.0,
+            "total_must_preserve": 45,
+            "preserved_count": 45,
+            "false_positive_count": 0,
+            "preservation_rate": 1.0,
+            "false_positive_rate": 0.0
+          }
+        },
+        "by_case_type": {
+          "clinical_eponym_trap": {
+            "total_rows": 6,
+            "total_must_mask": 14,
+            "masked_count": 13,
+            "missed_count": 1,
+            "mask_recall": 0.9286,
+            "total_must_preserve": 24,
+            "preserved_count": 24,
+            "false_positive_count": 0,
+            "preservation_rate": 1.0,
+            "false_positive_rate": 0.0
+          },
+          "dosage_lab_trap": {
+            "total_rows": 6,
+            "total_must_mask": 14,
+            "masked_count": 14,
+            "missed_count": 0,
+            "mask_recall": 1.0,
+            "total_must_preserve": 28,
+            "preserved_count": 28,
+            "false_positive_count": 0,
+            "preservation_rate": 1.0,
+            "false_positive_rate": 0.0
+          },
+          "mixed_edge_case": {
+            "total_rows": 4,
+            "total_must_mask": 16,
+            "masked_count": 15,
+            "missed_count": 1,
+            "mask_recall": 0.9375,
+            "total_must_preserve": 13,
+            "preserved_count": 13,
+            "false_positive_count": 0,
+            "preservation_rate": 1.0,
+            "false_positive_rate": 0.0
+          },
+          "multilingual_name_address": {
+            "total_rows": 4,
+            "total_must_mask": 16,
+            "masked_count": 16,
+            "missed_count": 0,
+            "mask_recall": 1.0,
+            "total_must_preserve": 8,
+            "preserved_count": 8,
+            "false_positive_count": 0,
+            "preservation_rate": 1.0,
+            "false_positive_rate": 0.0
+          },
+          "standard_pii": {
+            "total_rows": 4,
+            "total_must_mask": 16,
+            "masked_count": 16,
+            "missed_count": 0,
+            "mask_recall": 1.0,
+            "total_must_preserve": 10,
+            "preserved_count": 10,
+            "false_positive_count": 0,
+            "preservation_rate": 1.0,
+            "false_positive_rate": 0.0
+          }
+        }
+      },
+      "predictions": [
+        {
+          "id": "en_ner_01",
+          "language": "en",
+          "case_type": "standard_pii",
+          "text": "Patient John Miller (DOB: 1978-05-14, MRN-88421) reports chest tightness. Contact: john.miller@example.org or (415) 555-0192. BP 120/80 mmHg, ECG normal.",
+          "must_mask": [
+            "John Miller",
+            "1978-05-14",
+            "MRN-88421",
+            "john.miller@example.org",
+            "(415) 555-0192"
+          ],
+          "must_preserve": [
+            "chest tightness",
+            "120/80 mmHg",
+            "ECG"
+          ],
+          "anonymized_text": "<PERSON_1> (DOB: <DATE_1>, <ID_1>) reports chest tightness. Contact: <EMAIL_1> or <PHONE_1>. BP 120/80 mmHg, ECG normal.",
+          "entity_table": {
+            "<PERSON_1>": "Patient John Miller",
+            "<DATE_1>": "1978-05-14",
+            "<ID_1>": "MRN-88421",
+            "<EMAIL_1>": "john.miller@example.org",
+            "<PHONE_1>": "(415) 555-0192"
+          },
+          "masked_items": [
+            "John Miller",
+            "1978-05-14",
+            "MRN-88421",
+            "john.miller@example.org",
+            "(415) 555-0192"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "chest tightness",
+            "120/80 mmHg",
+            "ECG"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 21.0291
+        },
+        {
+          "id": "en_ner_02",
+          "language": "en",
+          "case_type": "standard_pii",
+          "text": "Follow-up for Sarah Jenkins, born 05/14/1985, residing at 742 Evergreen Terrace, Springfield. Prescribed Acetaminophen 500 mg PRN for tension headache.",
+          "must_mask": [
+            "Sarah Jenkins",
+            "05/14/1985",
+            "742 Evergreen Terrace, Springfield"
+          ],
+          "must_preserve": [
+            "Acetaminophen",
+            "500 mg",
+            "tension headache"
+          ],
+          "anonymized_text": "Follow-up for <PERSON_1>, born <DATE_1>, residing at <BUILDINGNUM_1> Evergreen Terrace, <LOCATION_1>. Prescribed Acetaminophen 500 mg PRN for tension headache.",
+          "entity_table": {
+            "<PERSON_1>": "Sarah Jenkins",
+            "<DATE_1>": "05/14/1985",
+            "<BUILDINGNUM_1>": "742",
+            "<LOCATION_1>": "Springfield"
+          },
+          "masked_items": [
+            "Sarah Jenkins",
+            "05/14/1985",
+            "742 Evergreen Terrace, Springfield"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "Acetaminophen",
+            "500 mg",
+            "tension headache"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 18.6057
+        },
+        {
+          "id": "en_ner_03",
+          "language": "en",
+          "case_type": "multilingual_name_address",
+          "text": "Maria Gonzalez presented on 2025-05-14 at our clinic. Lives at 1280 Mission Street, San Francisco; phone +1 415-890-4431. HbA1c 6.8% on Metformin 500 mg BID.",
+          "must_mask": [
+            "Maria Gonzalez",
+            "2025-05-14",
+            "1280 Mission Street, San Francisco",
+            "+1 415-890-4431"
+          ],
+          "must_preserve": [
+            "HbA1c 6.8%",
+            "Metformin 500 mg"
+          ],
+          "anonymized_text": "<PERSON_1> Gonzalez presented on <DATE_1> at our clinic. Lives at <BUILDINGNUM_1> <LOCATION_1>, <LOCATION_2>; phone <PHONE_1>. HbA1c 6.8% on Metformin 500 mg BID.",
+          "entity_table": {
+            "<PERSON_1>": "Maria",
+            "<DATE_1>": "2025-05-14",
+            "<BUILDINGNUM_1>": "1280",
+            "<LOCATION_1>": "Mission Street",
+            "<LOCATION_2>": "San Francisco",
+            "<PHONE_1>": "+1 415-890-4431"
+          },
+          "masked_items": [
+            "Maria Gonzalez",
+            "2025-05-14",
+            "1280 Mission Street, San Francisco",
+            "+1 415-890-4431"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "HbA1c 6.8%",
+            "Metformin 500 mg"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 21.4551
+        },
+        {
+          "id": "en_ner_04",
+          "language": "en",
+          "case_type": "multilingual_name_address",
+          "text": "Referral from Dr. med. Elena Rostova regarding patient Tomasz Kowalski (Pat-ID: 109234). Address: 45 Baker Street, London. Ordered CT thorax and CBC.",
+          "must_mask": [
+            "Dr. med. Elena Rostova",
+            "Tomasz Kowalski",
+            "Pat-ID: 109234",
+            "45 Baker Street, London"
+          ],
+          "must_preserve": [
+            "CT thorax",
+            "CBC"
+          ],
+          "anonymized_text": "Referral from Dr. med. <PERSON_1> Rostova regarding patient <PERSON_2> Kowalski (<ID_1>). Address: <BUILDINGNUM_1> <LOCATION_1>, <LOCATION_2>. Ordered CT thorax and CBC.",
+          "entity_table": {
+            "<PERSON_1>": "Elena",
+            "<PERSON_2>": "Tomasz",
+            "<ID_1>": "Pat-ID: 109234",
+            "<BUILDINGNUM_1>": "45",
+            "<LOCATION_1>": "Baker Street",
+            "<LOCATION_2>": "London"
+          },
+          "masked_items": [
+            "Dr. med. Elena Rostova",
+            "Tomasz Kowalski",
+            "Pat-ID: 109234",
+            "45 Baker Street, London"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "CT thorax",
+            "CBC"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 19.9784
+        },
+        {
+          "id": "en_ner_05",
+          "language": "en",
+          "case_type": "clinical_eponym_trap",
+          "text": "David Chen (MRN-55109) evaluated for progressive tremor consistent with Parkinson's disease. Started Levodopa 100 mg TID; no signs of Alzheimer dementia.",
+          "must_mask": [
+            "David Chen",
+            "MRN-55109"
+          ],
+          "must_preserve": [
+            "Parkinson's disease",
+            "Parkinson",
+            "Levodopa",
+            "100 mg",
+            "Alzheimer"
+          ],
+          "anonymized_text": "<PERSON_1> Chen (<ID_1>) evaluated for progressive tremor consistent with Parkinson's disease. Started Levodopa 100 mg TID; no signs of Alzheimer dementia.",
+          "entity_table": {
+            "<PERSON_1>": "David",
+            "<ID_1>": "MRN-55109"
+          },
+          "masked_items": [
+            "David Chen",
+            "MRN-55109"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "Parkinson's disease",
+            "Parkinson",
+            "Levodopa",
+            "100 mg",
+            "Alzheimer"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 17.8387
+        },
+        {
+          "id": "en_ner_06",
+          "language": "en",
+          "case_type": "clinical_eponym_trap",
+          "text": "Patient Emily Carter called from (312) 555-0148. History of Hashimoto thyroiditis and Crohn's disease; Wells Score 4 for DVT, D-dimer ordered.",
+          "must_mask": [
+            "Emily Carter",
+            "(312) 555-0148"
+          ],
+          "must_preserve": [
+            "Hashimoto",
+            "Crohn's disease",
+            "Wells Score 4",
+            "DVT",
+            "D-dimer"
+          ],
+          "anonymized_text": "<PERSON_1> called from <PHONE_1>. History of Hashimoto thyroiditis and Crohn's disease; Wells Score 4 for DVT, D-dimer ordered.",
+          "entity_table": {
+            "<PERSON_1>": "Patient Emily Carter",
+            "<PHONE_1>": "(312) 555-0148"
+          },
+          "masked_items": [
+            "Emily Carter",
+            "(312) 555-0148"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "Hashimoto",
+            "Crohn's disease",
+            "Wells Score 4",
+            "DVT",
+            "D-dimer"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 20.9194
+        },
+        {
+          "id": "en_ner_07",
+          "language": "en",
+          "case_type": "clinical_eponym_trap",
+          "text": "Consult note by Dr. Marcus Vance for Rebecca Hall (DOB: 03/22/1969). Suspect Bell's palsy vs. Guillain-Barre syndrome; ESR 18 mm/h.",
+          "must_mask": [
+            "Dr. Marcus Vance",
+            "Rebecca Hall",
+            "03/22/1969"
+          ],
+          "must_preserve": [
+            "Bell's palsy",
+            "Guillain-Barre syndrome",
+            "ESR 18 mm/h"
+          ],
+          "anonymized_text": "Consult note by <PERSON_1> for <LOCATION_1> Hall (DOB: <DATE_1>). Suspect Bell's palsy vs. Guillain-Barre syndrome; ESR 18 mm/h.",
+          "entity_table": {
+            "<PERSON_1>": "Dr. Marcus Vance",
+            "<LOCATION_1>": "Rebecca",
+            "<DATE_1>": "03/22/1969"
+          },
+          "masked_items": [
+            "Dr. Marcus Vance",
+            "Rebecca Hall",
+            "03/22/1969"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "Bell's palsy",
+            "Guillain-Barre syndrome",
+            "ESR 18 mm/h"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 26.4469
+        },
+        {
+          "id": "en_ner_08",
+          "language": "en",
+          "case_type": "dosage_lab_trap",
+          "text": "Pediatric dosing for Liam O'Connor (MRN-77310, DOB: 2018-11-02): Amoxicillin 10 mg/kg PO q8h. Temp 38.4 C, WBC 11.2.",
+          "must_mask": [
+            "Liam O'Connor",
+            "MRN-77310",
+            "2018-11-02"
+          ],
+          "must_preserve": [
+            "Amoxicillin",
+            "10 mg/kg",
+            "38.4 C",
+            "WBC 11.2"
+          ],
+          "anonymized_text": "Pediatric dosing for <PERSON_1> O'Connor (<ID_1>, DOB: <DATE_1>): Amoxicillin 10 mg/kg PO q8h. Temp 38.4 C, WBC 11.2.",
+          "entity_table": {
+            "<PERSON_1>": "Liam",
+            "<ID_1>": "MRN-77310",
+            "<DATE_1>": "2018-11-02"
+          },
+          "masked_items": [
+            "Liam O'Connor",
+            "MRN-77310",
+            "2018-11-02"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "Amoxicillin",
+            "10 mg/kg",
+            "38.4 C",
+            "WBC 11.2"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 27.4424
+        },
+        {
+          "id": "en_ner_09",
+          "language": "en",
+          "case_type": "dosage_lab_trap",
+          "text": "Anticoagulation clinic: Robert Kim, email r.kim@clinicmail.net. INR 2.4 today on Warfarin 5 mg daily; potassium 4.3 mmol/L, creatinine 0.9 mg/dL.",
+          "must_mask": [
+            "Robert Kim",
+            "r.kim@clinicmail.net"
+          ],
+          "must_preserve": [
+            "INR 2.4",
+            "Warfarin",
+            "5 mg",
+            "4.3 mmol/L",
+            "0.9 mg/dL"
+          ],
+          "anonymized_text": "Anticoagulation clinic: <PERSON_1>, email <EMAIL_1>. INR 2.4 today on Warfarin 5 mg daily; potassium 4.3 mmol/L, creatinine 0.9 mg/dL.",
+          "entity_table": {
+            "<PERSON_1>": "Robert Kim",
+            "<EMAIL_1>": "r.kim@clinicmail.net"
+          },
+          "masked_items": [
+            "Robert Kim",
+            "r.kim@clinicmail.net"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "INR 2.4",
+            "Warfarin",
+            "5 mg",
+            "4.3 mmol/L",
+            "0.9 mg/dL"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 32.7699
+        },
+        {
+          "id": "en_ner_10",
+          "language": "en",
+          "case_type": "dosage_lab_trap",
+          "text": "Discharge summary for Priya Patel (Pat-ID: 448120): BP 120/80 mmHg, HR 72 bpm, SpO2 98%. Continue Metformin 500 mg and Lisinopril 10 mg.",
+          "must_mask": [
+            "Priya Patel",
+            "Pat-ID: 448120"
+          ],
+          "must_preserve": [
+            "120/80 mmHg",
+            "HR 72 bpm",
+            "SpO2 98%",
+            "Metformin 500 mg",
+            "Lisinopril",
+            "10 mg"
+          ],
+          "anonymized_text": "Discharge summary for Priya <PERSON_1> (<ID_1>): BP 120/80 mmHg, HR 72 bpm, SpO2 98%. Continue Metformin 500 mg and Lisinopril 10 mg.",
+          "entity_table": {
+            "<PERSON_1>": "Patel",
+            "<ID_1>": "Pat-ID: 448120"
+          },
+          "masked_items": [
+            "Priya Patel",
+            "Pat-ID: 448120"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "120/80 mmHg",
+            "HR 72 bpm",
+            "SpO2 98%",
+            "Metformin 500 mg",
+            "Lisinopril",
+            "10 mg"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 31.9183
+        },
+        {
+          "id": "en_ner_11",
+          "language": "en",
+          "case_type": "mixed_edge_case",
+          "text": "Urgent message from Sofia Alvarez (05/14/2025): 'My mother Rosa Alvarez, DOB 14.05.1952, took 500 mg Acetaminophen after her CT thorax.' Reply to sofia.alvarez@mail.com.",
+          "must_mask": [
+            "Sofia Alvarez",
+            "05/14/2025",
+            "Rosa Alvarez",
+            "14.05.1952",
+            "sofia.alvarez@mail.com"
+          ],
+          "must_preserve": [
+            "500 mg",
+            "Acetaminophen",
+            "CT thorax"
+          ],
+          "anonymized_text": "Urgent message from <PERSON_1> Alvarez (<DATE_1>): 'My mother <PERSON_2> Alvarez, DOB <DATE_2>, took 500 mg Acetaminophen after her CT thorax.' Reply to <EMAIL_1>.",
+          "entity_table": {
+            "<PERSON_1>": "Sofia",
+            "<DATE_1>": "05/14/2025",
+            "<PERSON_2>": "Rosa",
+            "<DATE_2>": "14.05.1952",
+            "<EMAIL_1>": "sofia.alvarez@mail.com"
+          },
+          "masked_items": [
+            "Sofia Alvarez",
+            "05/14/2025",
+            "Rosa Alvarez",
+            "14.05.1952",
+            "sofia.alvarez@mail.com"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "500 mg",
+            "Acetaminophen",
+            "CT thorax"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 36.124
+        },
+        {
+          "id": "en_ner_12",
+          "language": "en",
+          "case_type": "mixed_edge_case",
+          "text": "Triage note: Hannah Brooks, +44 20 7946 0958, 99 Maple Ave, Boston. Known Cushing's syndrome; HbA1c 6.8%, INR 2.4, Wells Score 4.",
+          "must_mask": [
+            "Hannah Brooks",
+            "+44 20 7946 0958",
+            "99 Maple Ave, Boston"
+          ],
+          "must_preserve": [
+            "Cushing's syndrome",
+            "HbA1c 6.8%",
+            "INR 2.4",
+            "Wells Score 4"
+          ],
+          "anonymized_text": "Triage note: <PERSON_1> Brooks, <TELEPHONENUM_1>, <BUILDINGNUM_1> Maple Ave, <LOCATION_1>. Known Cushing's syndrome; HbA1c 6.8%, INR 2.4, Wells Score 4.",
+          "entity_table": {
+            "<PERSON_1>": "Hannah",
+            "<TELEPHONENUM_1>": "+44 20 7946 0958",
+            "<BUILDINGNUM_1>": "99",
+            "<LOCATION_1>": "Boston"
+          },
+          "masked_items": [
+            "Hannah Brooks",
+            "+44 20 7946 0958",
+            "99 Maple Ave, Boston"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "Cushing's syndrome",
+            "HbA1c 6.8%",
+            "INR 2.4",
+            "Wells Score 4"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 34.6552
+        },
+        {
+          "id": "de_ner_01",
+          "language": "de",
+          "case_type": "standard_pii",
+          "text": "Patient Lukas Weber (geb. 14.05.1982, Pat-ID: 109234) stellt sich mit Dyspnoe vor. Telefon: +49 30 901820, E-Mail: lukas.weber@beispiel.de. RR 120/80 mmHg.",
+          "must_mask": [
+            "Lukas Weber",
+            "14.05.1982",
+            "Pat-ID: 109234",
+            "+49 30 901820",
+            "lukas.weber@beispiel.de"
+          ],
+          "must_preserve": [
+            "Dyspnoe",
+            "120/80 mmHg"
+          ],
+          "anonymized_text": "<PERSON_1> (geb. <DATE_1>, <ID_1>) stellt sich mit Dyspnoe vor. Telefon: <TELEPHONENUM_1>, E-Mail: <EMAIL_1>. RR 120/80 mmHg.",
+          "entity_table": {
+            "<PERSON_1>": "Patient Lukas Weber",
+            "<DATE_1>": "14.05.1982",
+            "<ID_1>": "Pat-ID: 109234",
+            "<TELEPHONENUM_1>": "+49 30 901820",
+            "<EMAIL_1>": "lukas.weber@beispiel.de"
+          },
+          "masked_items": [
+            "Lukas Weber",
+            "14.05.1982",
+            "Pat-ID: 109234",
+            "+49 30 901820",
+            "lukas.weber@beispiel.de"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "Dyspnoe",
+            "120/80 mmHg"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 42.0171
+        },
+        {
+          "id": "de_ner_02",
+          "language": "de",
+          "case_type": "standard_pii",
+          "text": "Arztbrief für Katrin Hoffmann, wohnhaft Friedrichstraße 114, 10117 Berlin, MRN-88421. Befund: CT thorax ohne Infiltrat, CRP 4.2 mg/L.",
+          "must_mask": [
+            "Katrin Hoffmann",
+            "Friedrichstraße 114, 10117 Berlin",
+            "MRN-88421"
+          ],
+          "must_preserve": [
+            "CT thorax",
+            "CRP 4.2 mg/L"
+          ],
+          "anonymized_text": "Arztbrief für <PERSON_1> Hoffmann, wohnhaft Friedrichstraße <BUILDINGNUM_1>, 10117 <LOCATION_1>, <ID_1>. Befund: CT thorax ohne Infiltrat, CRP 4.2 mg/L.",
+          "entity_table": {
+            "<PERSON_1>": "Katrin",
+            "<BUILDINGNUM_1>": "114",
+            "<LOCATION_1>": "Berlin",
+            "<ID_1>": "MRN-88421"
+          },
+          "masked_items": [
+            "Katrin Hoffmann",
+            "Friedrichstraße 114, 10117 Berlin",
+            "MRN-88421"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "CT thorax",
+            "CRP 4.2 mg/L"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 32.7563
+        },
+        {
+          "id": "de_ner_03",
+          "language": "de",
+          "case_type": "multilingual_name_address",
+          "text": "Patient Hans-Jürgen Weiß, geb. 2025-05-14 (Aufnahmedatum), Anschrift: Goetheplatz 7, 80336 München. Medikation: Metformin 500 mg morgens, HbA1c 6.8%.",
+          "must_mask": [
+            "Hans-Jürgen Weiß",
+            "2025-05-14",
+            "Goetheplatz 7, 80336 München"
+          ],
+          "must_preserve": [
+            "Metformin 500 mg",
+            "HbA1c 6.8%"
+          ],
+          "anonymized_text": "<PERSON_1>-Jürgen <PERSON_2>, geb. <DATE_1> (Aufnahmedatum), Anschrift: Goetheplatz 7, 80336 <LOCATION_1>. Medikation: Metformin 500 mg morgens, HbA1c 6.8%.",
+          "entity_table": {
+            "<PERSON_1>": "Patient Hans",
+            "<PERSON_2>": "Weiß",
+            "<DATE_1>": "2025-05-14",
+            "<LOCATION_1>": "München"
+          },
+          "masked_items": [
+            "Hans-Jürgen Weiß",
+            "2025-05-14",
+            "Goetheplatz 7, 80336 München"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "Metformin 500 mg",
+            "HbA1c 6.8%"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 32.3915
+        },
+        {
+          "id": "de_ner_04",
+          "language": "de",
+          "case_type": "multilingual_name_address",
+          "text": "Überweisung von Dr. med. Elena Rostova für Anja Schäfer-König (Pat-ID: 204819), Tel. +49 89 1234567. Adresse: Hauptstraße 22, 50667 Köln. Acetaminophen 500 mg bei Bedarf.",
+          "must_mask": [
+            "Dr. med. Elena Rostova",
+            "Anja Schäfer-König",
+            "Pat-ID: 204819",
+            "+49 89 1234567",
+            "Hauptstraße 22, 50667 Köln"
+          ],
+          "must_preserve": [
+            "Acetaminophen",
+            "500 mg"
+          ],
+          "anonymized_text": "Überweisung von Dr. med. <PERSON_1> Rostova für <PERSON_2> Schäfer-König (<ID_1>), Tel. <TELEPHONENUM_1>. Adresse: Hauptstraße <BUILDINGNUM_1> 50667 <LOCATION_1>. Acetaminophen 500 mg bei Bedarf.",
+          "entity_table": {
+            "<PERSON_1>": "Elena",
+            "<PERSON_2>": "Anja",
+            "<ID_1>": "Pat-ID: 204819",
+            "<TELEPHONENUM_1>": "+49 89 1234567",
+            "<BUILDINGNUM_1>": "22,",
+            "<LOCATION_1>": "Köln"
+          },
+          "masked_items": [
+            "Dr. med. Elena Rostova",
+            "Anja Schäfer-König",
+            "Pat-ID: 204819",
+            "+49 89 1234567",
+            "Hauptstraße 22, 50667 Köln"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "Acetaminophen",
+            "500 mg"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 33.844
+        },
+        {
+          "id": "de_ner_05",
+          "language": "de",
+          "case_type": "clinical_eponym_trap",
+          "text": "Herr Matthias Becker (MRN-33901) mit bekanntem Morbus Crohn und Verdacht auf Morbus Basedow. TSH 0.08 mU/L, Therapie mit Thiamazol 10 mg.",
+          "must_mask": [
+            "Matthias Becker",
+            "MRN-33901"
+          ],
+          "must_preserve": [
+            "Morbus Crohn",
+            "Morbus Basedow",
+            "TSH 0.08 mU/L",
+            "Thiamazol",
+            "10 mg"
+          ],
+          "anonymized_text": "<TITLE_1> <PERSON_1> Becker (<ID_1>) mit bekanntem Morbus Crohn und Verdacht auf Morbus Basedow. TSH 0.08 mU/L, Therapie mit Thiamazol 10 mg.",
+          "entity_table": {
+            "<TITLE_1>": "Herr",
+            "<PERSON_1>": "Matthias",
+            "<ID_1>": "MRN-33901"
+          },
+          "masked_items": [
+            "Matthias Becker",
+            "MRN-33901"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "Morbus Crohn",
+            "Morbus Basedow",
+            "TSH 0.08 mU/L",
+            "Thiamazol",
+            "10 mg"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 23.1577
+        },
+        {
+          "id": "de_ner_06",
+          "language": "de",
+          "case_type": "clinical_eponym_trap",
+          "text": "Frau Sabine Krüger, geb. 09.11.1954, klagt über Gedächtnisstörungen; Ausschluss Alzheimer-Demenz und Parkinson-Syndrom. Kein Hinweis auf Hashimoto-Thyreoiditis.",
+          "must_mask": [
+            "Sabine Krüger",
+            "09.11.1954"
+          ],
+          "must_preserve": [
+            "Alzheimer",
+            "Parkinson",
+            "Hashimoto"
+          ],
+          "anonymized_text": "<TITLE_1> Sabine Krüger, geb. <DATE_1>, klagt über Gedächtnisstörungen; Ausschluss Alzheimer-Demenz und Parkinson-Syndrom. Kein Hinweis auf Hashimoto-Thyreoiditis.",
+          "entity_table": {
+            "<TITLE_1>": "Frau",
+            "<DATE_1>": "09.11.1954"
+          },
+          "masked_items": [
+            "09.11.1954"
+          ],
+          "missed_masks": [
+            "Sabine Krüger"
+          ],
+          "mask_recall": 0.5,
+          "preserved_items": [
+            "Alzheimer",
+            "Parkinson",
+            "Hashimoto"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 25.1868
+        },
+        {
+          "id": "de_ner_07",
+          "language": "de",
+          "case_type": "clinical_eponym_trap",
+          "text": "Konsil durch Dr. Thomas Braun für Patientin Julia Richter (05/14/2025). Wells Score 4 Punkte, D-Dimere erhöht, Duplexsonographie veranlasst.",
+          "must_mask": [
+            "Dr. Thomas Braun",
+            "Julia Richter",
+            "05/14/2025"
+          ],
+          "must_preserve": [
+            "Wells Score 4",
+            "D-Dimere",
+            "Duplexsonographie"
+          ],
+          "anonymized_text": "Konsil durch <PERSON_1> für Patientin <PERSON_2> (<DATE_1>). Wells Score 4 Punkte, D-Dimere erhöht, Duplexsonographie veranlasst.",
+          "entity_table": {
+            "<PERSON_1>": "Dr. Thomas Braun",
+            "<PERSON_2>": "Julia Richter",
+            "<DATE_1>": "05/14/2025"
+          },
+          "masked_items": [
+            "Dr. Thomas Braun",
+            "Julia Richter",
+            "05/14/2025"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "Wells Score 4",
+            "D-Dimere",
+            "Duplexsonographie"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 20.5505
+        },
+        {
+          "id": "de_ner_08",
+          "language": "de",
+          "case_type": "dosage_lab_trap",
+          "text": "Pädiatrie: Jonas Meyer (Pat-ID: 551920), geb. 12.03.2019. Ibuprofen 10 mg/kg KG alle 8 Stunden, Temperatur 39.1 °C, Leukozyten 13.4/nL.",
+          "must_mask": [
+            "Jonas Meyer",
+            "Pat-ID: 551920",
+            "12.03.2019"
+          ],
+          "must_preserve": [
+            "Ibuprofen",
+            "10 mg/kg",
+            "39.1 °C",
+            "13.4/nL"
+          ],
+          "anonymized_text": "Pädiatrie: <PERSON_1> (<ID_1>), geb. <DATE_1>. Ibuprofen 10 mg/kg KG alle 8 Stunden, Temperatur 39.1 °C, Leukozyten 13.4/nL.",
+          "entity_table": {
+            "<PERSON_1>": "Jonas Meyer",
+            "<ID_1>": "Pat-ID: 551920",
+            "<DATE_1>": "12.03.2019"
+          },
+          "masked_items": [
+            "Jonas Meyer",
+            "Pat-ID: 551920",
+            "12.03.2019"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "Ibuprofen",
+            "10 mg/kg",
+            "39.1 °C",
+            "13.4/nL"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 24.4205
+        },
+        {
+          "id": "de_ner_09",
+          "language": "de",
+          "case_type": "dosage_lab_trap",
+          "text": "Marcumar-Sprechstunde: Claudia Zimmermann, E-Mail c.zimmermann@praxis-test.de. INR 2.4 im Zielbereich, Kalium 4.1 mmol/L, Kreatinin 0.85 mg/dL.",
+          "must_mask": [
+            "Claudia Zimmermann",
+            "c.zimmermann@praxis-test.de"
+          ],
+          "must_preserve": [
+            "INR 2.4",
+            "4.1 mmol/L",
+            "0.85 mg/dL"
+          ],
+          "anonymized_text": "Marcumar-Sprechstunde: <PERSON_1>, E-Mail <EMAIL_1>. INR 2.4 im Zielbereich, Kalium 4.1 mmol/L, Kreatinin 0.85 mg/dL.",
+          "entity_table": {
+            "<PERSON_1>": "Claudia Zimmermann",
+            "<EMAIL_1>": "c.zimmermann@praxis-test.de"
+          },
+          "masked_items": [
+            "Claudia Zimmermann",
+            "c.zimmermann@praxis-test.de"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "INR 2.4",
+            "4.1 mmol/L",
+            "0.85 mg/dL"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 24.6627
+        },
+        {
+          "id": "de_ner_10",
+          "language": "de",
+          "case_type": "dosage_lab_trap",
+          "text": "Entlassbrief Stefan Wagner (MRN-61204): RR 120/80 mmHg, HF 68/min, SpO2 97%. Weiterführung von Metformin 500 mg und Ramipril 5 mg.",
+          "must_mask": [
+            "Stefan Wagner",
+            "MRN-61204"
+          ],
+          "must_preserve": [
+            "120/80 mmHg",
+            "HF 68/min",
+            "SpO2 97%",
+            "Metformin 500 mg",
+            "Ramipril",
+            "5 mg"
+          ],
+          "anonymized_text": "Entlassbrief <PERSON_1> (<ID_1>): RR 120/80 mmHg, HF 68/min, SpO2 97%. Weiterführung von Metformin 500 mg und Ramipril 5 mg.",
+          "entity_table": {
+            "<PERSON_1>": "Stefan Wagner",
+            "<ID_1>": "MRN-61204"
+          },
+          "masked_items": [
+            "Stefan Wagner",
+            "MRN-61204"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "120/80 mmHg",
+            "HF 68/min",
+            "SpO2 97%",
+            "Metformin 500 mg",
+            "Ramipril",
+            "5 mg"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 21.0497
+        },
+        {
+          "id": "de_ner_11",
+          "language": "de",
+          "case_type": "mixed_edge_case",
+          "text": "Patientennachricht von Mehmet Yılmaz (14.05.2025): 'Meine Frau Ayşe Yılmaz, geb. 1980-07-19, nimmt täglich 500 mg Metformin.' Rückruf unter +49 30 901820.",
+          "must_mask": [
+            "Mehmet Yılmaz",
+            "14.05.2025",
+            "Ayşe Yılmaz",
+            "1980-07-19",
+            "+49 30 901820"
+          ],
+          "must_preserve": [
+            "500 mg",
+            "Metformin"
+          ],
+          "anonymized_text": "Patientennachricht von <PERSON_1> Yılmaz <DATE_1>): 'Meine Frau <PERSON_2>, geb. <DATE_2>, nimmt täglich 500 mg Metformin.' Rückruf unter <TELEPHONENUM_1>.",
+          "entity_table": {
+            "<PERSON_1>": "Mehmet",
+            "<DATE_1>": "(14.05.2025",
+            "<PERSON_2>": "Ayşe Yılmaz",
+            "<DATE_2>": "1980-07-19",
+            "<TELEPHONENUM_1>": "+49 30 901820"
+          },
+          "masked_items": [
+            "Mehmet Yılmaz",
+            "14.05.2025",
+            "Ayşe Yılmaz",
+            "1980-07-19",
+            "+49 30 901820"
+          ],
+          "missed_masks": [],
+          "mask_recall": 1.0,
+          "preserved_items": [
+            "500 mg",
+            "Metformin"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 17.6676
+        },
+        {
+          "id": "de_ner_12",
+          "language": "de",
+          "case_type": "mixed_edge_case",
+          "text": "Notaufnahme: Franziska Müller-Lüdenscheidt, Berliner Allee 45, 40212 Düsseldorf, Tel. (415) 555-0192. V.a. Morbus Crohn, CT thorax unauffällig, INR 2.4, HbA1c 6.8%.",
+          "must_mask": [
+            "Franziska Müller-Lüdenscheidt",
+            "Berliner Allee 45, 40212 Düsseldorf",
+            "(415) 555-0192"
+          ],
+          "must_preserve": [
+            "Morbus Crohn",
+            "CT thorax",
+            "INR 2.4",
+            "HbA1c 6.8%"
+          ],
+          "anonymized_text": "Notaufnahme: Franziska Müller-Lüdenscheidt, <LOCATION_1> Allee <BUILDINGNUM_1>, 40212 <LOCATION_2>, Tel. <PHONE_1>. V.a. Morbus Crohn, CT thorax unauffällig, INR 2.4, HbA1c 6.8%.",
+          "entity_table": {
+            "<LOCATION_1>": "Berliner",
+            "<BUILDINGNUM_1>": "45",
+            "<LOCATION_2>": "Düsseldorf",
+            "<PHONE_1>": "(415) 555-0192"
+          },
+          "masked_items": [
+            "Berliner Allee 45, 40212 Düsseldorf",
+            "(415) 555-0192"
+          ],
+          "missed_masks": [
+            "Franziska Müller-Lüdenscheidt"
+          ],
+          "mask_recall": 0.6667,
+          "preserved_items": [
+            "Morbus Crohn",
+            "CT thorax",
+            "INR 2.4",
+            "HbA1c 6.8%"
+          ],
+          "false_positives": [],
+          "preservation_rate": 1.0,
+          "latency_ms": 25.4736
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,13 @@
+# secrets
+.env
+
+# python
+**/__pycache__/
+.pytest_cache/
+.ruff_cache/
+.venv/
+**/*.egg-info/
+
+# local models
+models/*
+!models/.gitkeep

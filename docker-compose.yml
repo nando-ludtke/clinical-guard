@@ -1,0 +1,113 @@
+services:
+  e5-guard:
+    build:
+      context: .
+      dockerfile: docker/e5.Dockerfile
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./models:/app/models
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+      OMP_NUM_THREADS: ${OMP_NUM_THREADS:-2}
+      MKL_NUM_THREADS: ${MKL_NUM_THREADS:-2}
+      OPENBLAS_NUM_THREADS: ${OPENBLAS_NUM_THREADS:-2}
+      TOKENIZERS_PARALLELISM: "false"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8001/health', timeout=3)",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  prompt-guard:
+    build:
+      context: .
+      dockerfile: docker/prompt.Dockerfile
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./models:/app/models
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+      OMP_NUM_THREADS: ${OMP_NUM_THREADS:-2}
+      MKL_NUM_THREADS: ${MKL_NUM_THREADS:-2}
+      OPENBLAS_NUM_THREADS: ${OPENBLAS_NUM_THREADS:-2}
+      TOKENIZERS_PARALLELISM: "false"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8002/health', timeout=3)",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  ner-pii-guard:
+    build:
+      context: .
+      dockerfile: docker/ner.Dockerfile
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./models:/app/models
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+      OMP_NUM_THREADS: ${OMP_NUM_THREADS:-2}
+      MKL_NUM_THREADS: ${MKL_NUM_THREADS:-2}
+      OPENBLAS_NUM_THREADS: ${OPENBLAS_NUM_THREADS:-2}
+      TOKENIZERS_PARALLELISM: "false"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8003/health', timeout=3)",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  clinical-guard-api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      CLINICAL_GUARD_E5_GUARD_URL: http://e5-guard:8001
+      CLINICAL_GUARD_PROMPT_GUARD_URL: http://prompt-guard:8002
+      CLINICAL_GUARD_NER_GUARD_URL: http://ner-pii-guard:8003
+      CLINICAL_GUARD_WORKER_TIMEOUT_SECONDS: ${CLINICAL_GUARD_WORKER_TIMEOUT_SECONDS:-10.0}
+    depends_on:
+      e5-guard:
+        condition: service_healthy
+      prompt-guard:
+        condition: service_healthy
+      ner-pii-guard:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
