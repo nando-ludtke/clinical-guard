@@ -28,6 +28,12 @@ class Settings(BaseSettings):
     worker_timeout_seconds: float = 10.0
     enable_local_ner: bool = False
 
+    rate_limit_enabled: bool = True
+    rate_limit_requests: int = 20
+    rate_limit_window_seconds: int = 60
+    max_concurrent_inferences: int = 4
+    inference_queue_timeout_seconds: float = 15.0
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

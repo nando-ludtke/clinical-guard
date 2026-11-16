@@ -1,12 +1,13 @@
 """FastAPI application entrypoint for clinical-guard."""
 
+import asyncio
 import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated, Any
 
-from fastapi import Depends, FastAPI, Header, Request
+from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 from fastapi.responses import HTMLResponse
 
 from clinical_guard.benchmarks import load_benchmark_suites
@@ -25,6 +26,11 @@ from clinical_guard.logging_config import (
 from clinical_guard.pipelines.context_pipeline import run_context_pipeline
 from clinical_guard.pipelines.safety_pipeline import run_safety_pipeline
 from clinical_guard.privacy.anonymizer import LocalAnonymizer
+from clinical_guard.rate_limit import (
+    SlidingWindowRateLimiter,
+    acquire_inference_slot,
+    get_client_ip,
+)
 from clinical_guard.safety.content_safety import E5SafetyGuard
 from clinical_guard.safety.prompt_safety import PromptInjectionGuard
 from clinical_guard.schemas import (
@@ -109,6 +115,57 @@ def get_local_anonymizer(request: Request) -> LocalAnonymizer:
 get_anonymizer = get_local_anonymizer
 
 
+def get_rate_limiter(request: Request) -> SlidingWindowRateLimiter:
+    """Return the app-scoped IP sliding-window rate limiter."""
+    limiter = getattr(request.app.state, "rate_limiter", None)
+    if limiter is None:
+        current_settings = get_settings()
+        limiter = SlidingWindowRateLimiter(
+            max_requests=current_settings.rate_limit_requests,
+            window_seconds=current_settings.rate_limit_window_seconds,
+        )
+        request.app.state.rate_limiter = limiter
+    return limiter
+
+
+def get_inference_semaphore(request: Request) -> asyncio.Semaphore:
+    """Return the app-scoped inference concurrency semaphore."""
+    semaphore = getattr(request.app.state, "inference_semaphore", None)
+    if semaphore is None:
+        current_settings = get_settings()
+        semaphore = asyncio.Semaphore(current_settings.max_concurrent_inferences)
+        request.app.state.inference_semaphore = semaphore
+    return semaphore
+
+
+def enforce_rate_limit(
+    request: Request,
+    rate_limiter: Annotated[SlidingWindowRateLimiter, Depends(get_rate_limiter)],
+) -> None:
+    """Enforce per-IP rate limiting on guard endpoints when enabled."""
+    current_settings = get_settings()
+    if not current_settings.rate_limit_enabled:
+        return
+
+    client_ip = get_client_ip(request)
+    allowed, retry_after = rate_limiter.check(client_ip)
+    if not allowed:
+        logger.warning(
+            "rate_limit_exceeded",
+            extra={
+                "event": "rate_limit_exceeded",
+                "client_ip": client_ip,
+                "path": request.url.path,
+                "retry_after_seconds": retry_after,
+            },
+        )
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Rate limit exceeded. Please try again shortly.",
+            headers={"Retry-After": str(retry_after)},
+        )
+
+
 @asynccontextmanager
 async def lifespan(fastapi_app: FastAPI) -> AsyncIterator[None]:
     """Initialize structured logging, guard instances, and emit lifecycle audit events."""
@@ -123,6 +180,15 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncIterator[None]:
         fastapi_app.state.groundedness_checker = ContextGroundednessChecker()
     if getattr(fastapi_app.state, "local_anonymizer", None) is None:
         fastapi_app.state.local_anonymizer = _build_anonymizer(current_settings)
+    if getattr(fastapi_app.state, "rate_limiter", None) is None:
+        fastapi_app.state.rate_limiter = SlidingWindowRateLimiter(
+            max_requests=current_settings.rate_limit_requests,
+            window_seconds=current_settings.rate_limit_window_seconds,
+        )
+    if getattr(fastapi_app.state, "inference_semaphore", None) is None:
+        fastapi_app.state.inference_semaphore = asyncio.Semaphore(
+            current_settings.max_concurrent_inferences
+        )
 
     logger.info(
         "service_startup",
@@ -187,20 +253,29 @@ async def list_benchmarks() -> dict[str, list[dict[str, Any]]]:
     return {"benchmarks": load_benchmark_suites()}
 
 
-@app.post("/v1/guard/evaluate", response_model=GuardResponse, tags=["guard"])
+@app.post(
+    "/v1/guard/evaluate",
+    response_model=GuardResponse,
+    tags=["guard"],
+    dependencies=[Depends(enforce_rate_limit)],
+)
 async def evaluate_guard(
     payload: GuardRequest,
     x_user_role: Annotated[UserRole, Header(alias="X-User-Role")],
     prompt_guard: Annotated[PromptInjectionGuard, Depends(get_prompt_guard)],
     e5_guard: Annotated[E5SafetyGuard, Depends(get_e5_guard)],
+    inference_semaphore: Annotated[asyncio.Semaphore, Depends(get_inference_semaphore)],
 ) -> GuardResponse:
     """Evaluate prompt-injection and E5 content safety guards, then resolve routing policy."""
-    result = await run_safety_pipeline(
-        query=payload.query,
-        user_role=x_user_role,
-        prompt_guard=prompt_guard,
-        e5_guard=e5_guard,
-    )
+    async with acquire_inference_slot(
+        inference_semaphore, get_settings().inference_queue_timeout_seconds
+    ):
+        result = await run_safety_pipeline(
+            query=payload.query,
+            user_role=x_user_role,
+            prompt_guard=prompt_guard,
+            e5_guard=e5_guard,
+        )
     routing_decision = result.routing_decision
     prompt_result = result.prompt_result
     e5_result = result.e5_result
@@ -255,6 +330,7 @@ async def evaluate_guard(
     "/v1/guard/evaluate_context",
     response_model=ContextEvaluateResponse,
     tags=["context"],
+    dependencies=[Depends(enforce_rate_limit)],
 )
 async def evaluate_context(
     payload: ContextEvaluateRequest,
@@ -263,19 +339,23 @@ async def evaluate_context(
         ContextGroundednessChecker, Depends(get_groundedness_checker)
     ],
     anonymizer: Annotated[LocalAnonymizer, Depends(get_local_anonymizer)],
+    inference_semaphore: Annotated[asyncio.Semaphore, Depends(get_inference_semaphore)],
     x_openai_api_key: Annotated[str | None, Header(alias="X-OpenAI-Api-Key")] = None,
 ) -> ContextEvaluateResponse:
     """Run parallel injection gate + local anonymization, then groundedness with citations."""
-    result = await run_context_pipeline(
-        query=payload.query,
-        response_text=payload.response_text,
-        contexts=payload.contexts,
-        conversation_history=payload.conversation_history,
-        prompt_guard=prompt_guard,
-        groundedness_checker=groundedness_checker,
-        anonymizer=anonymizer,
-        api_key=x_openai_api_key,
-    )
+    async with acquire_inference_slot(
+        inference_semaphore, get_settings().inference_queue_timeout_seconds
+    ):
+        result = await run_context_pipeline(
+            query=payload.query,
+            response_text=payload.response_text,
+            contexts=payload.contexts,
+            conversation_history=payload.conversation_history,
+            prompt_guard=prompt_guard,
+            groundedness_checker=groundedness_checker,
+            anonymizer=anonymizer,
+            api_key=x_openai_api_key,
+        )
 
     logger.info(
         "context_evaluated",

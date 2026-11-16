@@ -8,10 +8,18 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
-import numpy as np
 import pytest
-import torch
 from fastapi.testclient import TestClient
+
+try:
+    import numpy as np
+except ImportError:  # pragma: no cover - optional ml extra
+    np = None  # type: ignore[assignment]
+
+try:
+    import torch
+except ImportError:  # pragma: no cover - optional ml extra
+    torch = None  # type: ignore[assignment]
 
 from clinical_guard.context.context_check import (
     ContextGroundednessChecker,
@@ -113,6 +121,7 @@ class _FakeSentenceTransformer:
 
 def test_e5_guard_hard_block_soft_flag_and_allow(monkeypatch: pytest.MonkeyPatch) -> None:
     """E5SafetyGuard distinguishes hard_block, soft_flag, and allow via margin."""
+    pytest.importorskip("numpy")
     monkeypatch.setattr(
         "clinical_guard.safety.content_safety.SentenceTransformer",
         _FakeSentenceTransformer,
@@ -151,6 +160,7 @@ def test_e5_guard_hard_block_soft_flag_and_allow(monkeypatch: pytest.MonkeyPatch
 
 def test_e5_guard_per_category_hard_block_margins(monkeypatch: pytest.MonkeyPatch) -> None:
     """Default per-category margins hard-block self_harm at 0.03 and soft-flag overdose."""
+    pytest.importorskip("numpy")
     monkeypatch.setattr(
         "clinical_guard.safety.content_safety.SentenceTransformer",
         _FakeSentenceTransformer,
@@ -180,6 +190,7 @@ def test_e5_guard_prompt_injection_routes_to_security_block(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """E5SafetyGuard prompt_injection anchor hard-blocks and routes to security_block."""
+    pytest.importorskip("numpy")
     monkeypatch.setattr(
         "clinical_guard.safety.content_safety.SentenceTransformer",
         _FakeSentenceTransformer,
@@ -249,6 +260,8 @@ def test_prompt_injection_guard_classification_and_threshold(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """PromptInjectionGuard detects injections and respects configurable threshold."""
+    pytest.importorskip("torch")
+    pytest.importorskip("transformers")
     fake_model = _FakePromptGuardModel()
     monkeypatch.setattr(
         "clinical_guard.safety.prompt_safety.AutoTokenizer.from_pretrained",
@@ -284,6 +297,7 @@ def test_prompt_injection_guard_delimiter_smuggling_short_circuits(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Delimiter smuggling is caught immediately via regex without loading the transformer."""
+    pytest.importorskip("transformers")
 
     def _fail_load(_name: str) -> object:
         raise AssertionError("Transformer should not be loaded for delimiter smuggling")
