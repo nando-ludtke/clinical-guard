@@ -1,10 +1,23 @@
-# 4-Container Docker Deployment & Configuration
+# Docker Deployment & Configuration
 
-**Scope:** `docker-compose.yml`, `docker/api.Dockerfile`, `docker/e5.Dockerfile`, `docker/prompt.Dockerfile`, `docker/ner.Dockerfile`, `docker/scripts/start_e5_guard.sh`, `docker/scripts/start_prompt_guard.sh`, `docker/scripts/start_ner_guard.sh`, `src/clinical_guard/config.py` (`Settings`), `src/clinical_guard/main.py`, `src/clinical_guard/clients/worker_clients.py`, and `src/clinical_guard/workers/*.py`.
+**Scope:** `docker-compose.yml`, `docker-compose.single.yml`, `docker/*.Dockerfile`, `docker/scripts/*.sh`, `src/clinical_guard/config.py` (`Settings`), `src/clinical_guard/rate_limit.py`, `src/clinical_guard/main.py`, `src/clinical_guard/clients/worker_clients.py`, and `src/clinical_guard/workers/*.py`.
 
 ---
 
-## 1. 4-Container Architecture
+## 1. Deployment Modes: Single-Container vs. 4-Container
+
+### 1.1 Single-Container Mode (`docker-compose.single.yml`) — Recommended for 4 GB VPS / Showcases
+For single-node or 4 GB RAM VPS deployments (e.g., Hetzner `CAX11`), `docker-compose.single.yml` (`docker/single.Dockerfile` + `docker/scripts/start_single.sh`) runs all three models in-process inside one container:
+- Eliminates duplicated Python/PyTorch/ONNX runtimes and internal HTTP hops (~2–2.5 GB RAM instead of ~3.5 GB).
+- Sets `CLINICAL_GUARD_ENABLE_LOCAL_NER=true` so `OnnxPiiDetector` runs in-process.
+- Binds `127.0.0.1:8080:8000` so a reverse proxy (Caddy/Nginx) handles public HTTPS on port `8080` -> container `8000`.
+- Downloads any missing models into `./models` on first boot using `HF_TOKEN`.
+
+```bash
+docker compose -f docker-compose.single.yml up -d --build
+```
+
+### 1.2 4-Container Architecture (`docker-compose.yml`)
 
 For production isolation and independent ML dependency packaging (PyTorch CPU vs. ONNX Runtime vs. slim API gateway), `docker-compose.yml` splits `clinical-guard` into four services:
 
@@ -29,7 +42,7 @@ For production isolation and independent ML dependency packaging (PyTorch CPU vs
 
 | Service | Dockerfile | Port | Model / Role | Healthcheck & Dependencies |
 | --- | --- | --- | --- | --- |
-| `clinical-guard-api` | `docker/api.Dockerfile` | `8000` | FastAPI API gateway, routing, `EntityTable`, `litellm` judge | `GET /health` (`15s` interval, `5` retries); `depends_on` all 3 workers with `condition: service_healthy` |
+| `clinical-guard-api` | `docker/api.Dockerfile` | `8080 -> 8000` | FastAPI API gateway, routing, `EntityTable`, `litellm` judge | `GET /health` (`15s` interval, `5` retries); `depends_on` all 3 workers with `condition: service_healthy` |
 | `e5-guard` | `docker/e5.Dockerfile` | `8001` | `E5SafetyGuard` (`intfloat/multilingual-e5-small`) via `e5_worker.py` | `GET /health` (`15s` interval, `10` retries, `60s` `start_period`) |
 | `prompt-guard` | `docker/prompt.Dockerfile` | `8002` | `PromptInjectionGuard` (`meta-llama/Llama-Prompt-Guard-2-86M`) via `prompt_worker.py` | `GET /health` (`15s` interval, `10` retries, `60s` `start_period`) |
 | `ner-pii-guard` | `docker/ner.Dockerfile` | `8003` | `OnnxPiiDetector` (`onnx-community/multilang-pii-ner-ONNX`) via `ner_worker.py` | `GET /health` (`15s` interval, `10` retries, `60s` `start_period`) |
@@ -77,6 +90,11 @@ All application settings use `pydantic-settings` (`Settings`, `env_prefix="CLINI
 | `CLINICAL_GUARD_NER_GUARD_URL` | `None` | If set (e.g. `http://ner-pii-guard:8003`), uses `HttpNerDetector` |
 | `CLINICAL_GUARD_WORKER_TIMEOUT_SECONDS` | `10.0` | HTTP timeout for worker `httpx.AsyncClient` calls |
 | `CLINICAL_GUARD_ENABLE_LOCAL_NER` | `false` | Enables in-process `OnnxPiiDetector` when `NER_GUARD_URL` is unset |
+| `CLINICAL_GUARD_RATE_LIMIT_ENABLED` | `true` | Enables per-IP sliding-window rate limiting on `/v1/guard/*` |
+| `CLINICAL_GUARD_RATE_LIMIT_REQUESTS` | `20` | Max requests per IP within the sliding window |
+| `CLINICAL_GUARD_RATE_LIMIT_WINDOW_SECONDS` | `60` | Sliding-window duration in seconds |
+| `CLINICAL_GUARD_MAX_CONCURRENT_INFERENCES` | `4` | Max concurrent model-pipeline executions (`2` in `docker-compose.single.yml`) |
+| `CLINICAL_GUARD_INFERENCE_QUEUE_TIMEOUT_SECONDS` | `15.0` | Seconds a request waits for an inference slot before returning `503` |
 
 ### 3.1 In-Process Local Mode vs. Docker HTTP Worker Mode
 Implemented in `src/clinical_guard/main.py` (`_build_prompt_guard`, `_build_e5_guard`, `_build_anonymizer`):
@@ -91,4 +109,9 @@ Used by `ContextGroundednessChecker` (`POST /v1/guard/evaluate_context` via `lit
 ### 3.3 CPU Threading, Warmup & Layer-Cached Dockerfiles
 - **CPU thread-contention defaults (`docker-compose.yml`):** Each ML worker (`e5-guard`, `prompt-guard`, `ner-pii-guard`) sets `OMP_NUM_THREADS=${OMP_NUM_THREADS:-2}`, `MKL_NUM_THREADS=${MKL_NUM_THREADS:-2}`, `OPENBLAS_NUM_THREADS=${OPENBLAS_NUM_THREADS:-2}`, and `TOKENIZERS_PARALLELISM="false"` to prevent thread oversubscription across concurrent CPU containers.
 - **Startup warmup (`src/clinical_guard/workers/*.py`):** Each worker runs a single lightweight warmup inference call (`guard.evaluate("warmup check")` or `detector.detect("warmup check")`) in its FastAPI `lifespan` immediately after `.load()` so lazy PyTorch/ONNX kernels compile before `/health` reports ready.
-- **Layer-cached Dockerfiles (`docker/*.Dockerfile`):** All 4 Dockerfiles use `# syntax=docker/dockerfile:1` with BuildKit pip cache mounts (`--mount=type=cache,target=/root/.cache/pip`) to install third-party dependencies before `COPY src/ ./src/`, followed by `pip install --no-deps --no-cache-dir .` so code-only edits rebuild without re-downloading ML wheels.
+- **Layer-cached Dockerfiles (`docker/*.Dockerfile`):** All Dockerfiles use `# syntax=docker/dockerfile:1` with BuildKit pip cache mounts (`--mount=type=cache,target=/root/.cache/pip`) to install third-party dependencies before `COPY src/ ./src/`.
+
+### 3.4 Rate Limiting & Inference Concurrency (`src/clinical_guard/rate_limit.py`)
+All three guard endpoints (`POST /v1/guard/evaluate`, `POST /v1/guard/prompt`, `POST /v1/guard/evaluate_context`) are protected by:
+- **`SlidingWindowRateLimiter` (`enforce_rate_limit`):** Extracts the client IP (`X-Forwarded-For` → `X-Real-IP` → `request.client.host`), tracks sliding-window timestamps per IP (default `20` requests per `60s`), prunes stale buckets, and returns `HTTP 429` with `Retry-After`. System and benchmark routes (`/`, `/health`, `/v1/config/status`, `/v1/benchmarks`) remain unthrottled.
+- **`acquire_inference_slot` (`asyncio.Semaphore`):** Bounds concurrent CPU inference runs (`CLINICAL_GUARD_MAX_CONCURRENT_INFERENCES`) and returns `HTTP 503` (`Retry-After: 5`) if a slot is not acquired within `CLINICAL_GUARD_INFERENCE_QUEUE_TIMEOUT_SECONDS`.

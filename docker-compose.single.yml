@@ -1,0 +1,35 @@
+services:
+  clinical-guard:
+    build:
+      context: .
+      dockerfile: docker/single.Dockerfile
+    ports:
+      - "127.0.0.1:8080:8000"
+    volumes:
+      - ./models:/app/models
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      CLINICAL_GUARD_ENVIRONMENT: ${CLINICAL_GUARD_ENVIRONMENT:-production}
+      CLINICAL_GUARD_ENABLE_LOCAL_NER: "true"
+      CLINICAL_GUARD_RATE_LIMIT_ENABLED: ${CLINICAL_GUARD_RATE_LIMIT_ENABLED:-true}
+      CLINICAL_GUARD_RATE_LIMIT_REQUESTS: ${CLINICAL_GUARD_RATE_LIMIT_REQUESTS:-20}
+      CLINICAL_GUARD_RATE_LIMIT_WINDOW_SECONDS: ${CLINICAL_GUARD_RATE_LIMIT_WINDOW_SECONDS:-60}
+      CLINICAL_GUARD_MAX_CONCURRENT_INFERENCES: ${CLINICAL_GUARD_MAX_CONCURRENT_INFERENCES:-2}
+      OMP_NUM_THREADS: ${OMP_NUM_THREADS:-2}
+      MKL_NUM_THREADS: ${MKL_NUM_THREADS:-2}
+      OPENBLAS_NUM_THREADS: ${OPENBLAS_NUM_THREADS:-2}
+      TOKENIZERS_PARALLELISM: "false"
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s

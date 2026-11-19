@@ -35,7 +35,10 @@ When `PromptInjectionGuard` flags a user message (`is_injection=True`):
 
 As a second semantic layer for roleplay/persona-override jailbreaks (EN & DE) that evade sequence-classification prompt guards, `E5SafetyGuard` includes a `"prompt_injection"` anchor group (paired with benign educational-framing anchors to prevent false positives). When `"prompt_injection"` is the top E5 category with `margin >= prompt_injection_margin` (defaults to `hard_block_margin = 0.05`), `E5SafetyGuard` emits `action="hard_block"`, `risk_category="prompt_injection"`, and `resolve_policy()` routes it to `decision="block_security"`, `routing_target="security_block"` (`rule_id="E5_HARD_BLOCK_PROMPT_INJECTION"`).
 
-### 2.3 Parallel Injection Checks on User Messages & `ContextDocument`s
+### 2.3 Dedicated Prompt-Injection Endpoint (`POST /v1/guard/prompt`)
+For non-clinical or upstream callers that only need prompt-injection screening without `X-User-Role` or clinical routing, `POST /v1/guard/prompt` (`src/clinical_guard/main.py`) accepts `GuardRequest(query, session_id)` and reuses `run_safety_pipeline` (`PromptInjectionGuard` + `E5SafetyGuard` defense-in-depth) to return `PromptCheckResponse(is_injection, blocked_by, rule_id, prompt_guard_score, prompt_guard_label, e5_margin, latency_ms, session_id)`.
+
+### 2.4 Parallel Injection Checks on User Messages & `ContextDocument`s
 Implemented in `run_context_pipeline` (`src/clinical_guard/pipelines/context_pipeline.py`):
 - **Parallel fan-out**: Uses `anyio.create_task_group()` to run `PromptInjectionGuard` concurrently across `query`, `response_text`, `conversation_history` messages, and every `ContextDocument.text` (in parallel with `LocalAnonymizer`).
 - **Document-level attribution**: If any `ContextDocument` triggers `is_injection=True`, its `doc_id` is collected in `flagged_doc_ids` and the pipeline returns `security_blocked=True`, `routing_target="security_block"` before calling `litellm`.

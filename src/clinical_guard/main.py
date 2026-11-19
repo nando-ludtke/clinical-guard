@@ -40,6 +40,8 @@ from clinical_guard.schemas import (
     GuardRequest,
     GuardResponse,
     HealthResponse,
+    PromptBlockedBy,
+    PromptCheckResponse,
     UserRole,
 )
 
@@ -323,6 +325,67 @@ async def evaluate_guard(
             e5_margin=e5_result.margin,
             e5_latency_ms=e5_result.latency_ms,
         ),
+    )
+
+
+@app.post(
+    "/v1/guard/prompt",
+    response_model=PromptCheckResponse,
+    tags=["guard"],
+    dependencies=[Depends(enforce_rate_limit)],
+)
+async def check_prompt_injection(
+    payload: GuardRequest,
+    prompt_guard: Annotated[PromptInjectionGuard, Depends(get_prompt_guard)],
+    e5_guard: Annotated[E5SafetyGuard, Depends(get_e5_guard)],
+    inference_semaphore: Annotated[asyncio.Semaphore, Depends(get_inference_semaphore)],
+) -> PromptCheckResponse:
+    """Screen a query for prompt injection using PromptInjectionGuard + E5 defense-in-depth."""
+    async with acquire_inference_slot(
+        inference_semaphore, get_settings().inference_queue_timeout_seconds
+    ):
+        result = await run_safety_pipeline(
+            query=payload.query,
+            user_role="layman",
+            prompt_guard=prompt_guard,
+            e5_guard=e5_guard,
+        )
+
+    prompt_result = result.prompt_result
+    e5_result = result.e5_result
+    routing_decision = result.routing_decision
+
+    is_injection = routing_decision.decision == "block_security"
+    blocked_by: PromptBlockedBy = "none"
+    if prompt_result.is_injection:
+        blocked_by = "prompt_guard"
+    elif is_injection:
+        blocked_by = "e5_prompt_injection"
+
+    logger.info(
+        "prompt_checked",
+        extra={
+            "event": "prompt_checked",
+            "session_id": payload.session_id,
+            "is_injection": is_injection,
+            "blocked_by": blocked_by,
+            "rule_id": routing_decision.rule_id if is_injection else None,
+            "prompt_score": prompt_result.score,
+            "e5_margin": e5_result.margin,
+            "latency_ms": result.latency_ms,
+            **redact_query_metadata(payload.query),
+        },
+    )
+
+    return PromptCheckResponse(
+        is_injection=is_injection,
+        blocked_by=blocked_by,
+        rule_id=routing_decision.rule_id if is_injection else None,
+        prompt_guard_score=prompt_result.score,
+        prompt_guard_label=prompt_result.label,
+        e5_margin=e5_result.margin,
+        latency_ms=result.latency_ms,
+        session_id=payload.session_id,
     )
 
 

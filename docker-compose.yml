@@ -85,7 +85,7 @@ services:
       context: .
       dockerfile: docker/api.Dockerfile
     ports:
-      - "8000:8000"
+      - "8080:8000"
     environment:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       CLINICAL_GUARD_E5_GUARD_URL: http://e5-guard:8001

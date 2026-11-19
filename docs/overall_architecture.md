@@ -7,8 +7,10 @@ For component-level details, see:
 - [Content Safety Guard](content_safety.md) (`E5SafetyGuard`)
 - [Policy & Decision Routing](policy_architecture.md) (`POLICY_MATRIX`, `resolve_policy`)
 - [Context Groundedness Check](context_check.md) (`ContextGroundednessChecker`, `run_context_pipeline`)
+- [Local NER & PII Anonymization](privacy_anonymizer.md) (`LocalAnonymizer`, `EntityTable`, `OnnxPiiDetector`)
+- [Docker Deployment & Configuration](deployment.md) (Single-container & 4-container setups, rate limiting, concurrency)
 
-*(Note: Dedicated standalone docs for `src/clinical_guard/privacy/anonymizer.py` (`docs/privacy_anonymizer.md`) and Docker/worker deployment (`docs/deployment.md`) are not yet created; their architecture is summarized below and in [Context Groundedness Check](context_check.md).)*
+> **Additional Guard Endpoint:** `POST /v1/guard/prompt` reuses `run_safety_pipeline` (`PromptInjectionGuard` + `E5SafetyGuard` defense-in-depth) to return a role-independent `PromptCheckResponse` (`is_injection`, `blocked_by`, `rule_id`). All `/v1/guard/*` endpoints are protected by `SlidingWindowRateLimiter` and an `asyncio.Semaphore` inference queue (`src/clinical_guard/rate_limit.py`).
 
 ---
 

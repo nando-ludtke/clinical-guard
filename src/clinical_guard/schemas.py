@@ -157,3 +157,21 @@ class ContextEvaluateResponse(BaseModel):
     groundedness: GroundednessResult | None = None
     latency_ms: float = Field(..., ge=0.0)
     session_id: str
+
+
+PromptBlockedBy = Literal["none", "prompt_guard", "e5_prompt_injection"]
+
+
+class PromptCheckResponse(BaseModel):
+    """Structured prompt-injection check response (PromptInjectionGuard + E5 defense-in-depth)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    is_injection: bool
+    blocked_by: PromptBlockedBy
+    rule_id: str | None = None
+    prompt_guard_score: float
+    prompt_guard_label: str
+    e5_margin: float
+    latency_ms: float = Field(..., ge=0.0)
+    session_id: str
