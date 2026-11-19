@@ -8,7 +8,6 @@ import os
 import statistics
 import time
 from concurrent.futures import ProcessPoolExecutor
-from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
@@ -201,12 +200,11 @@ def main() -> None:
     args = parser.parse_args()
 
     all_rows = load_dataset(args.data)
-    if args.split != "all":
-        rows = [r for r in all_rows if r["split"] == args.split]
-    else:
-        rows = all_rows
+    rows = [r for r in all_rows if r["split"] == args.split] if args.split != "all" else all_rows
 
-    print(f"Evaluating {len(rows)} rows (split={args.split}) with {args.workers} worker processes...")
+    print(
+        f"Evaluating {len(rows)} rows (split={args.split}) with {args.workers} worker processes..."
+    )
     t0 = time.perf_counter()
     with ProcessPoolExecutor(max_workers=args.workers, initializer=_init_worker) as pool:
         results = list(pool.map(_eval_row, rows, chunksize=8))
