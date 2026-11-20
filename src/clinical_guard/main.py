@@ -7,8 +7,10 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated, Any
 
+import litellm
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 from fastapi.responses import HTMLResponse
+from openai import OpenAIError
 
 from clinical_guard.benchmarks import load_benchmark_suites
 from clinical_guard.clients.worker_clients import (
@@ -409,16 +411,32 @@ async def evaluate_context(
     async with acquire_inference_slot(
         inference_semaphore, get_settings().inference_queue_timeout_seconds
     ):
-        result = await run_context_pipeline(
-            query=payload.query,
-            response_text=payload.response_text,
-            contexts=payload.contexts,
-            conversation_history=payload.conversation_history,
-            prompt_guard=prompt_guard,
-            groundedness_checker=groundedness_checker,
-            anonymizer=anonymizer,
-            api_key=x_openai_api_key,
-        )
+        try:
+            result = await run_context_pipeline(
+                query=payload.query,
+                response_text=payload.response_text,
+                contexts=payload.contexts,
+                conversation_history=payload.conversation_history,
+                prompt_guard=prompt_guard,
+                groundedness_checker=groundedness_checker,
+                anonymizer=anonymizer,
+                api_key=x_openai_api_key,
+            )
+        except litellm.AuthenticationError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="OpenAI authentication failed. Check OPENAI_API_KEY or X-OpenAI-Api-Key.",
+            ) from exc
+        except litellm.RateLimitError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail=f"Upstream LLM rate limit exceeded: {exc}",
+            ) from exc
+        except (OpenAIError, litellm.exceptions.OpenAIError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail=f"Context groundedness evaluation failed: {exc}",
+            ) from exc
 
     logger.info(
         "context_evaluated",

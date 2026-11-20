@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from clinical_guard.safety._load_lock import HF_MODEL_LOAD_LOCK
+
 try:
     import torch
 except ImportError:  # pragma: no cover - optional ml extra
@@ -83,23 +85,26 @@ class PromptInjectionGuard:
         """Load tokenizer and sequence classification model onto CPU in eval mode."""
         if self.is_loaded:
             return
-        if (
-            torch is None
-            or AutoTokenizer is None
-            or AutoModelForSequenceClassification is None
-        ):
-            raise ImportError(
-                "PromptInjectionGuard requires 'torch' and 'transformers'. "
-                "Install with: pip install 'clinical-guard[ml]'"
-            )
+        with HF_MODEL_LOAD_LOCK:
+            if self.is_loaded:
+                return
+            if (
+                torch is None
+                or AutoTokenizer is None
+                or AutoModelForSequenceClassification is None
+            ):
+                raise ImportError(
+                    "PromptInjectionGuard requires 'torch' and 'transformers'. "
+                    "Install with: pip install 'clinical-guard[ml]'"
+                )
 
-        tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        model = AutoModelForSequenceClassification.from_pretrained(self.model_name)
-        model.to(self.device)
-        model.eval()
+            tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+            model = AutoModelForSequenceClassification.from_pretrained(self.model_name)
+            model.to(self.device)
+            model.eval()
 
-        self._tokenizer = tokenizer
-        self._model = model
+            self._tokenizer = tokenizer
+            self._model = model
 
     def evaluate(self, query: str) -> PromptGuardResult:
         """Classify whether the incoming query contains a prompt injection."""

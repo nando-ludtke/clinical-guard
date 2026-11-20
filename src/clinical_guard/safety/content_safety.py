@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal, cast
 
+from clinical_guard.safety._load_lock import HF_MODEL_LOAD_LOCK
+
 try:
     import numpy as np
 except ImportError:  # pragma: no cover - optional ml extra
@@ -178,32 +180,39 @@ class E5SafetyGuard:
         """Load SentenceTransformer on CPU and pre-encode L2-normalized anchor passages."""
         if self.is_loaded:
             return
-        if SentenceTransformer is None or np is None:
-            raise ImportError(
-                "E5SafetyGuard requires 'sentence-transformers' and 'numpy'. "
-                "Install with: pip install 'clinical-guard[ml]'"
+        with HF_MODEL_LOAD_LOCK:
+            if self.is_loaded:
+                return
+            if SentenceTransformer is None or np is None:
+                raise ImportError(
+                    "E5SafetyGuard requires 'sentence-transformers' and 'numpy'. "
+                    "Install with: pip install 'clinical-guard[ml]'"
+                )
+
+            model = SentenceTransformer(
+                self.model_name,
+                device=self.device,
+                model_kwargs={"low_cpu_mem_usage": False},
+            )
+            anchor_texts: list[str] = []
+            anchor_labels: list[str] = []
+            for category, phrases in self._anchor_phrases.items():
+                for phrase in phrases:
+                    anchor_texts.append(f"passage: {phrase}")
+                    anchor_labels.append(category)
+
+            anchor_embeddings = model.encode(
+                anchor_texts,
+                normalize_embeddings=True,
+                show_progress_bar=False,
             )
 
-        model = SentenceTransformer(self.model_name, device=self.device)
-        anchor_texts: list[str] = []
-        anchor_labels: list[str] = []
-        for category, phrases in self._anchor_phrases.items():
-            for phrase in phrases:
-                anchor_texts.append(f"passage: {phrase}")
-                anchor_labels.append(category)
-
-        anchor_embeddings = model.encode(
-            anchor_texts,
-            normalize_embeddings=True,
-            show_progress_bar=False,
-        )
-
-        self._category_indices = {
-            cat: [idx for idx, lbl in enumerate(anchor_labels) if lbl == cat]
-            for cat in self._anchor_phrases
-        }
-        self._anchor_embeddings = np.asarray(anchor_embeddings, dtype=np.float32)
-        self._model = model
+            self._category_indices = {
+                cat: [idx for idx, lbl in enumerate(anchor_labels) if lbl == cat]
+                for cat in self._anchor_phrases
+            }
+            self._anchor_embeddings = np.asarray(anchor_embeddings, dtype=np.float32)
+            self._model = model
 
     def evaluate(self, query: str) -> E5GuardResult:
         """Evaluate a user query against pre-encoded E5 prototype anchors."""

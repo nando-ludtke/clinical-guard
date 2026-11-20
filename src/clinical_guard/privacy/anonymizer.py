@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
 
+from clinical_guard.safety._load_lock import HF_MODEL_LOAD_LOCK
+
 try:
     from optimum.onnxruntime import ORTModelForTokenClassification
 except ImportError:  # pragma: no cover - optional privacy/ml extra
@@ -289,32 +291,35 @@ class OnnxPiiDetector:
         """Lazy-load tokenizer, ORT token classification model, and NER pipeline."""
         if self._pipeline is not None:
             return
-        if AutoTokenizer is None or pipeline is None or ORTModelForTokenClassification is None:
-            raise ImportError(
-                "OnnxPiiDetector requires 'transformers' and 'optimum[onnxruntime]'. "
-                "Install with: pip install 'clinical-guard[privacy]'"
-            )
+        with HF_MODEL_LOAD_LOCK:
+            if self._pipeline is not None:
+                return
+            if AutoTokenizer is None or pipeline is None or ORTModelForTokenClassification is None:
+                raise ImportError(
+                    "OnnxPiiDetector requires 'transformers' and 'optimum[onnxruntime]'. "
+                    "Install with: pip install 'clinical-guard[privacy]'"
+                )
 
-        tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        load_kwargs: dict[str, Any] = {}
-        model_path = Path(self.model_name)
-        if model_path.is_dir() and not (model_path / "model.onnx").is_file():
-            for subfolder, file_name in (
-                ("onnx", "model.onnx"),
-                ("onnx", "model_quantized.onnx"),
-            ):
-                if (model_path / subfolder / file_name).is_file():
-                    load_kwargs["subfolder"] = subfolder
-                    load_kwargs["file_name"] = file_name
-                    break
-        model = ORTModelForTokenClassification.from_pretrained(self.model_name, **load_kwargs)
-        self._pipeline = pipeline(
-            "ner",
-            model=model,
-            tokenizer=tokenizer,
-            aggregation_strategy=self.aggregation_strategy,
-            device=self.device,
-        )
+            tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+            load_kwargs: dict[str, Any] = {}
+            model_path = Path(self.model_name)
+            if model_path.is_dir() and not (model_path / "model.onnx").is_file():
+                for subfolder, file_name in (
+                    ("onnx", "model.onnx"),
+                    ("onnx", "model_quantized.onnx"),
+                ):
+                    if (model_path / subfolder / file_name).is_file():
+                        load_kwargs["subfolder"] = subfolder
+                        load_kwargs["file_name"] = file_name
+                        break
+            model = ORTModelForTokenClassification.from_pretrained(self.model_name, **load_kwargs)
+            self._pipeline = pipeline(
+                "ner",
+                model=model,
+                tokenizer=tokenizer,
+                aggregation_strategy=self.aggregation_strategy,
+                device=self.device,
+            )
 
     def detect(self, text: str) -> list[EntitySpan]:
         """Detect PII entities in text and return normalized EntitySpans."""

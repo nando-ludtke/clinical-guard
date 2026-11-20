@@ -1256,6 +1256,26 @@ print(resp.json())</pre>
       route_layman: 'bg-emerald-100 text-emerald-800 border border-emerald-300',
     };
 
+    async function parseJsonSafe(res) {
+      const rawText = await res.text();
+      let data = null;
+      if (rawText) {
+        try {
+          data = JSON.parse(rawText);
+        } catch {
+          data = null;
+        }
+      }
+      if (!res.ok) {
+        const msg = (data && (data.detail || data.message)) || rawText || `HTTP ${res.status}`;
+        throw new Error(msg);
+      }
+      if (data === null) {
+        throw new Error('Server returned a non-JSON response.');
+      }
+      return data;
+    }
+
     async function runSafetyEvaluation() {
       const query = document.getElementById('safetyQueryInput').value.trim();
       const role = document.getElementById('userRoleSelect').value;
@@ -1284,10 +1304,7 @@ print(resp.json())</pre>
             session_id: 'showcase-ui-' + Date.now(),
           }),
         });
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.detail || `HTTP ${res.status}`);
-        }
+        const data = await parseJsonSafe(res);
 
         const badge = document.getElementById('resDecisionBadge');
         badge.textContent = data.decision;
@@ -1648,8 +1665,13 @@ print(resp.json())</pre>
       if (inlineKey) {
         sessionStorage.setItem(SESSION_KEY_STORAGE, inlineKey);
       }
-      const apiKey = sessionStorage.getItem(SESSION_KEY_STORAGE);
+      const apiKey = sessionStorage.getItem(SESSION_KEY_STORAGE)?.trim();
       if (apiKey) {
+        if (!/^[\x21-\x7E]+$/.test(apiKey)) {
+          errBox.textContent = 'Context evaluation failed: OpenAI API key contains invalid or non-ASCII characters. Please re-enter it.';
+          errBox.classList.remove('hidden');
+          return;
+        }
         headers['X-OpenAI-Api-Key'] = apiKey;
       }
 
@@ -1667,10 +1689,7 @@ print(resp.json())</pre>
             session_id: 'showcase-ctx-' + Date.now(),
           }),
         });
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.detail || `HTTP ${res.status}`);
-        }
+        const data = await parseJsonSafe(res);
         renderContextResult(data, cleanedDocs);
         resBox.classList.remove('hidden');
       } catch (err) {
